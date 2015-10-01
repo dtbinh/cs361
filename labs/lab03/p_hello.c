@@ -1,7 +1,6 @@
 /*
  * p_hello.c -- a hello program (in pthread)
  */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>

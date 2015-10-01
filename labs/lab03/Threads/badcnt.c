@@ -8,6 +8,7 @@ void *thread(void *vargp);  /* Thread routine prototype */
 
 /* Global shared variable */
 volatile int cnt = 0; /* Counter */
+sem_t cntMutex;
 
 int main(int argc, char **argv) 
 {
