@@ -21,29 +21,35 @@ int main()
 
         switch (c)
         {
-            case 'O':  //close button pressed
-                e = CLOSE_BUTTON_PRESSED;
+            case 'O':  //order recieved
+                e = ORDER_RCVD;
                 handle_event (e);
                 break;
-            case 'V': //closed detected
-                e = CLOSED_DETECTED;
+            case 'V': //valid payment
+                e = VALID_PYMNT;
                 handle_event (e);
                 break;
-            case 'I': //open button pressed
-                e = OPEN_BUTTON_PRESSED;
+            case 'I': //invalid payment
+                e = INVALID_PYMNT;
                 handle_event (e);
                 break;
-            case 'F': //opened deteced
-                e = OPENED_DETECTED;
+            case 'F': //manufactering faild
+                e = MANUF_FAILED;
                 handle_event (e);
                 break;
-            case 'C': // exit
-                exit = 1;
+            case 'C': //manufactering complete
+                e = MANUF_COMPLETED;
+                handle_event (e);
                 break;
-            case 'R': // exit
-                exit = 1;
+            case 'R': //delivery recieved
+                e = RECIEVED;
+                handle_event (e);
                 break;
-            case 'L': // exit
+            case 'L': //delivery lost
+                e = LOST_PACKAGE;
+                handle_event (e);
+                break;
+            case 'X': // exit
                 exit = 1;
                 break;
         }

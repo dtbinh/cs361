@@ -21,17 +21,26 @@ void handle_event( event current_event )
     next_state = NULL;
         switch( current_event )
         {
-            case CLOSE_BUTTON_PRESSED:
-                next_state = current_state -> close_button_pressed();
+            case ORDER_RCVD:
+                next_state = current_state -> order_recieved();
                 break;
-            case CLOSED_DETECTED:
-                next_state = current_state -> closed_detected();
+            case VALID_PYMNT:
+                next_state = current_state -> valid_payment();
                 break;
-            case OPEN_BUTTON_PRESSED:
-                next_state = current_state -> open_button_pressed();
+            case INVALID_PYMNT:
+                next_state = current_state -> invalid_payment();
                 break;
-            case OPENED_DETECTED:
-                next_state = current_state -> opened_detected();
+            case MANUF_FAILED:
+                next_state = current_state -> manufacturing_failed();
+                break;
+            case MANUF_COMPLETED:
+                next_state = current_state -> manufacturing_completed();
+                break;
+            case RECIEVED:
+                next_state = current_state -> recieved_package();
+                break;
+            case LOST_PACKAGE:
+                next_state = current_state -> lost_package();
                 break;
         }
 

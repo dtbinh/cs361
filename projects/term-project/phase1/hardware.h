@@ -25,11 +25,13 @@ typedef enum
 
 typedef enum
 {
-    CLOSE_BUTTON_PRESSED,
-    CLOSED_DETECTED,
-    OPEN_BUTTON_PRESSED,
-    OPENED_DETECTED,
-    NUMBER_OF_EVENTS
+	ORDER_RCVD,
+	VALID_PYMNT,
+	INVALID_PYMNT,
+	MANUF_FAILED,
+	MANUF_COMPLETED,
+	RECIEVED,
+	LOST_PACKAGE
 } event;
 
 void set_closed_indicator(led_setting value);

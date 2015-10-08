@@ -17,6 +17,8 @@ struct state {
 	event_handler*	closed_detected;
 	event_handler*	open_button_pressed;
 	event_handler*	opened_detected;
+	event_handler*	open_button_pressed;
+	event_handler*	opened_detected;
 	action*			entry_to;
 	action*			exit_from;
 };
