@@ -21,23 +21,29 @@ int main()
 
         switch (c)
         {
-            case 'c':  //close button pressed
+            case 'O':  //close button pressed
                 e = CLOSE_BUTTON_PRESSED;
                 handle_event (e);
                 break;
-            case 'C': //closed detected
+            case 'V': //closed detected
                 e = CLOSED_DETECTED;
                 handle_event (e);
                 break;
-            case 'o': //open button pressed
+            case 'I': //open button pressed
                 e = OPEN_BUTTON_PRESSED;
                 handle_event (e);
                 break;
-            case 'O': //opened deteced
+            case 'F': //opened deteced
                 e = OPENED_DETECTED;
                 handle_event (e);
                 break;
-            case 'x': // exit
+            case 'C': // exit
+                exit = 1;
+                break;
+            case 'R': // exit
+                exit = 1;
+                break;
+            case 'L': // exit
                 exit = 1;
                 break;
         }

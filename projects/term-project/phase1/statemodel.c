@@ -41,24 +41,23 @@ void handle_event( event current_event )
 
             current_state -> entry_to();
 
-            if (current_state == &closing)
+            if (current_state == &accepting)
             {
-                printf("Current State is: CLOSING\n");
+                printf("Current State is: ACCEPTING\n");
             }
-            else if (current_state == &closed)
+            else if (current_state == &processing)
             {
-                printf("Current State is: CLOSED\n");
+                printf("Current State is: PROCESSING\n");
             }
-            else if (current_state == &opening)
+            else if (current_state == &manufacturing)
             {
-                printf("Current State is: OPENING\n");
+                printf("Current State is: MANUFACTURING\n");
             }
-            else if (current_state == &opened)
+            else if (current_state == &shippping)
             {
-                printf("Current State is: OPENED\n");
+                printf("Current State is: SHIPPING\n");
             }
         }
-
 }
 
 #endif

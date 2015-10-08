@@ -11,10 +11,10 @@
 #include "hardware.h"
 #include "state.h"
 
-extern state_t closed;
-extern state_t closing;
-extern state_t opened;
-extern state_t opening;
+extern state_t accepting;
+extern state_t processing;
+extern state_t manufacturing;
+extern state_t shippping;
 
 void handle_event(event current_event);
 
