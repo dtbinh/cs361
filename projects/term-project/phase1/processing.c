@@ -1,7 +1,7 @@
 /*
  * processing.c
  *
- *  Created on: Sep 14, 2015
+ *  Created on: Oct 08, 2015
  *      Author: Joshua Lyons and Conner Turnbull (Group 1)
  */
 
@@ -15,13 +15,13 @@
 state_t processing = {
 	default_event_handler,
 	valid_payment,
-    invalid_payment,
-    default_event_handler,
-    default_event_handler,
-    default_event_handler,
-    default_event_handler,
-    entry_to,
-    default_action
+    	invalid_payment,
+    	default_event_handler,
+    	default_event_handler,
+    	default_event_handler,
+    	default_event_handler,
+    	entry_to,
+    	default_action
 };
 
 state_t* valid_payment()
