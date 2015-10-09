@@ -1,7 +1,7 @@
 /*
  * accepting.c
  *
- *  Created on: Sep 14, 2015
+ *  Created on: Oct 08, 2015
  *      Author: Joshua Lyons and Conner Turnbull (Group 1)
  */
 
@@ -14,14 +14,14 @@
 
 state_t accepting = {
 	order_recieved,
-    default_event_handler,
-    default_event_handler,
-    default_event_handler,
-    default_event_handler,
-    default_event_handler,
-    default_event_handler,
-    default_action,
-    default_action
+    	default_event_handler,
+    	default_event_handler,
+    	default_event_handler,
+    	default_event_handler,
+    	default_event_handler,
+    	default_event_handler,
+    	default_action,
+    	default_action
 };
 
 state_t* order_recieved()
