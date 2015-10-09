@@ -1,8 +1,7 @@
 /*
  * statemodel.c
-
  *
- *  Created on: Sep 14, 2015
+ *  Created on: Oct 08, 2015
  *      Author: Joshua Lyons and Conner Turnbull (Group 1)
  */
 
@@ -12,7 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static state_t * current_state = &opened;
+static state_t * current_state = &accepting;
 
 void handle_event( event current_event )
 {
@@ -62,7 +61,7 @@ void handle_event( event current_event )
             {
                 printf("Current State is: MANUFACTURING\n");
             }
-            else if (current_state == &shippping)
+            else if (current_state == &shipping)
             {
                 printf("Current State is: SHIPPING\n");
             }
