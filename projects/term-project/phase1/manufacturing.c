@@ -14,14 +14,14 @@
 
 state_t manufacturing = {
 	default_event_handler,
-    default_event_handler,
-    default_event_handler,
-    manufacturing_failed,
-    manufacturing_completed,
-    default_event_handler,
-    default_event_handler,
-    entry_to,
-    exit_from
+    	default_event_handler,
+    	default_event_handler,
+    	manufacturing_failed,
+    	manufacturing_completed,
+    	default_event_handler,
+    	default_event_handler,
+    	entry_to,
+    	exit_from
 };
 
 state_t* manufacturing_failed()
