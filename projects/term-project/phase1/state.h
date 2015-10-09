@@ -1,7 +1,7 @@
 /*
  * state.h
  *
- *  Created on: Sep 14, 2015
+ *  Created on: Oct 08, 2015
  *      Author: Joshua Lyons
  */
 
@@ -13,17 +13,18 @@ typedef state_t* event_handler(void);
 typedef void action(void);
 
 struct state {
-	event_handler*	close_button_pressed;
-	event_handler*	closed_detected;
-	event_handler*	open_button_pressed;
-	event_handler*	opened_detected;
-	event_handler*	open_button_pressed;
-	event_handler*	opened_detected;
-	action*			entry_to;
-	action*			exit_from;
+	event_handler*	order_recieved;
+	event_handler*	valid_payment;
+	event_handler*	invalid_payment;
+	event_handler*	manufacturing_failed;
+	event_handler*	manufacturing_completed;
+	event_handler*	recieved_package;
+	event_handler*	lost_package;
+	action*		entry_to;
+	action*		exit_from;
 };
 
 extern state_t*	default_event_handler();
-extern void		default_action();
+extern void	default_action();
 
 #endif
