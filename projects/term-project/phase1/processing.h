@@ -12,6 +12,6 @@
 
 static state_t* valid_payment();
 static state_t* invalid_payment();
-static void		entry_to();
+static void		  entry_to();
 
 #endif
