@@ -1,7 +1,7 @@
 /*
  * driver.c
  *
- *  Created on: Sep 14, 2015
+ *  Created on: Oct 08, 2015
  *      Author: Joshua Lyons and Conner Turnbull (Group 1)
  */
 
@@ -10,7 +10,7 @@
 
 int main()
 {
-    printf("Current State is: OPENED\n");
+    printf("Current State is: ACCEPTING\n");
     int c;
     event e;
     int exit = 0; // if 1, exit loop
