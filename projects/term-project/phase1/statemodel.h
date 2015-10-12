@@ -2,7 +2,7 @@
  * statemodel.h
  *
  *  Created on: Oct 08, 2015
- *      Author: joshualyons
+ *      Author: Joshua Lyons and Conner Turnbull
  */
 
 #ifndef statemodel_h
