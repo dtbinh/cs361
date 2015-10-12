@@ -2,7 +2,7 @@
  * manufacturing.h
  *
  *  Created on: Oct 08, 2015
- *      Author: Joshua Lyons
+ *      Author: Joshua Lyons and Conner Turnbull
  */
 
 #ifndef MANUFACTURING_H_
