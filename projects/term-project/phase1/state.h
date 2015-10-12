@@ -2,7 +2,7 @@
  * state.h
  *
  *  Created on: Oct 08, 2015
- *      Author: Joshua Lyons
+ *      Author: Joshua Lyons and Conner Turnbull
  */
 
 #ifndef STATE_H_
