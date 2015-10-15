@@ -12,6 +12,6 @@ typedef struct {
     double d2;
 } shared_data;
 
-#define SHMEM_KE 0x100
+#define SHMEM_KEY 0x100
 #define SHMEM_SIZE sizeof(shared_data)
 

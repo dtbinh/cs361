@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 		exit(-1);	
 	}
 
-	slept(2);
+	sleep(2);
 	
 	p = (shared_data *) shmat(shmid, NULL, 0);
 	if(p == (shared_data *)-1){

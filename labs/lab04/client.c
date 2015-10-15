@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
   shared_data *p;
 
   shmkey = SHMEM_KEY;
-  shmflg = IPC_CREAT | S_IRUSR | S_IWUSR /* | IPC_EXCL */
+  shmflg = IPC_CREAT | S_IRUSR | S_IWUSR; /* | IPC_EXCL */
 
     shmid = shmget(shmkey, SHMEM_SIZE, shmflg);
   if (shmid != -1) {
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
   printf("\nd1=%8.3f, d2=%8.3f\n", p->d1, p->d2);
 
   shmdt(p);
-  shmctl(shmid, PIC_RMID, NULL);
+  shmctl(shmid, IPC_RMID, NULL);
   printf("Client -- Goodbye\n");
   return 0;
 }
