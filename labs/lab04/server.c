@@ -33,14 +33,13 @@ int main(int argc, char *argv[])
 		printf("\nFailed to attach shared memory id=%d\n", shmid);
 		exit(-1);
 	}
-
-	while(! p->started);
+	
+	sem_wait(&p->c);
 	p->d2 = p->d1 + 1;
-	p->finished = 1;
 
 	shmdt(p);
 	shmctl(shmid, IPC_RMID, NULL);
 	printf("Server -- Goodbye\n");
-
+	sem_post(&p->s);
 	return 0;
 }

@@ -37,14 +37,17 @@ int main(int argc, char *argv[])
       exit(-1);
   }
 
-  p->finished = 0; p->d1 = 15.0; p->started = 1;
-  sleep(2); /* now wait for server process to do its part */
-  while (!p->finished);
+  p->d1 = 15.0;
+  sem_init(&p->c, 1, 0); 
+  sem_init(&p->s, 1, 0); 
+  /* now wait for server process to do its part */
+  sem_wait(&p->s);
 
   printf("\nd1=%8.3f, d2=%8.3f\n", p->d1, p->d2);
 
   shmdt(p);
   shmctl(shmid, IPC_RMID, NULL);
   printf("Client -- Goodbye\n");
+  sem_post(&p->c);
   return 0;
 }
