@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
   sem_init(&p->c, 1, 0); 
   sem_init(&p->s, 1, 0); 
   /* now wait for server process to do its part */
+  sem_post(&p->c);
   sem_wait(&p->s);
 
   printf("\nd1=%8.3f, d2=%8.3f\n", p->d1, p->d2);
