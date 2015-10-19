@@ -26,17 +26,15 @@ int main(int argc, char *argv[])
 		exit(-1);	
 	}
 
-	sleep(2);
-	
 	p = (shared_data *) shmat(shmid, NULL, 0);
 	if(p == (shared_data *)-1){
 		printf("\nFailed to attach shared memory id=%d\n", shmid);
 		exit(-1);
 	}
-	sem_post(&p->s);
 	sem_wait(&p->c);
 	p->d2 = p->d1 + 1;
 
+	sem_post(&p->s);
 	shmdt(p);
 	shmctl(shmid, IPC_RMID, NULL);
 	printf("Server -- Goodbye\n");

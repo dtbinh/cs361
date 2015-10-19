@@ -49,6 +49,5 @@ int main(int argc, char *argv[])
   shmdt(p);
   shmctl(shmid, IPC_RMID, NULL);
   printf("Client -- Goodbye\n");
-  sem_post(&p->c);
   return 0;
 }
