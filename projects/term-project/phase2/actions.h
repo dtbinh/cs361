@@ -36,5 +36,6 @@ int incrementAttempts();
 void getPaymentMethod();
 void dispatchFactoryLines();
 void shutDownFactoryLines();
+void *factoryLines(void *arg);
 
 #endif
