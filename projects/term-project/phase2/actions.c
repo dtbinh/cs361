@@ -91,7 +91,7 @@ void getPaymentMethod()
 
 void dispatchFactoryLines()
 {
-	pthread_t tid;
+	pthread_t tid1, tid2, tid3, tid4, tid5;
 
 	printf("Factory lines dispatched.\n");
 
@@ -102,14 +102,19 @@ void dispatchFactoryLines()
 
 	parts_remaining = order_size;  //sets parts_remaining, which will be used to keep track of how long the threads will run
 
-	for(int ii = 0; ii < 5; ii++)
-		pthread_create(&tid, NULL, factoryLines, (void *) ii);  //creates the 5 threads
+	//for(int ii = 0; ii < 5; ii++)
+	pthread_create(&tid1, NULL, factoryLines, (void *) 1);  //creates the 5 threads
+	pthread_create(&tid2, NULL, factoryLines, (void *) 2);
+	pthread_create(&tid3, NULL, factoryLines, (void *) 3);
+	pthread_create(&tid4, NULL, factoryLines, (void *) 4);
+	pthread_create(&tid5, NULL, factoryLines, (void *) 5);
 
-	pthread_join(tid, NULL); //waiting for each thread to finish
-	pthread_join(tid, NULL);
-	pthread_join(tid, NULL);
-	pthread_join(tid, NULL);
-	pthread_join(tid, NULL);
+	pthread_join(tid1, NULL); //waiting for each thread to finish
+	pthread_join(tid2, NULL);
+	pthread_join(tid3, NULL);
+	pthread_join(tid4, NULL);
+	pthread_join(tid5, NULL);
+
 }
 /*
  * Each thread will have its own random capacity and duration
@@ -152,6 +157,7 @@ void *factoryLines(void *arg)
 
 void shutDownFactoryLines()
 {
+	//pthread_exit(NULL);
 	printf("Factory lines shutdown.\n");
 }
 
