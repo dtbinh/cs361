@@ -110,10 +110,6 @@ void dispatchFactoryLines()
 	pthread_join(tid, NULL);
 	pthread_join(tid, NULL);
 	pthread_join(tid, NULL);
-
-
-	//We will need to print additional output here...
-
 }
 /*
  * Each thread will have its own random capacity and duration
