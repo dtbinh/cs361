@@ -13,6 +13,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <unistd.h>
 
 int attempts = 0;
 int order_size = 0;
@@ -97,7 +98,7 @@ void dispatchFactoryLines()
 	//sets the random seed value and assigns a random value to order_size between 1000-2000 (inclusively)
 	srandom(time(NULL));
 	order_size = (random() % 1000) + 1000;
-	printf("Order Size: %d", order_size);
+	printf("Order Size: %d\n", order_size);
 
 	parts_remaining = order_size;  //sets parts_remaining, which will be used to keep track of how long the threads will run
 
@@ -105,6 +106,10 @@ void dispatchFactoryLines()
 		pthread_create(&tid, NULL, factoryLines, (void *) ii);  //creates the 5 threads
 
 	pthread_join(tid, NULL); //waiting for each thread to finish
+	pthread_join(tid, NULL);
+	pthread_join(tid, NULL);
+	pthread_join(tid, NULL);
+	pthread_join(tid, NULL);
 
 
 	//We will need to print additional output here...
@@ -118,12 +123,34 @@ void *factoryLines(void *arg)
 	int tNum = (int) arg;
 	int capacity;
 	int duration;
+	int numIters = 0;
+	int produced = 0;
 
 	capacity = (random() % 40) + 10;  //sets random capacity between 10-50
 	duration = (random() % 4) + 1;  //sets random duration between 1-5
 
 	printf("Factory Line %d Capacity: %d\n", tNum, capacity);
 	printf("Factory Line %d Duration: %d\n", tNum, duration);
+
+	do
+	{
+		numIters++;
+		sleep(duration);
+		if(capacity < parts_remaining)
+		{
+			produced += capacity;
+		}
+		else
+		{
+			produced += parts_remaining;
+		}
+		parts_remaining -= capacity;
+	}
+	while(parts_remaining > 0);
+
+	printf("Factory Line %d Total Iterations: %d\n", tNum, numIters);
+	printf("Factory Line %d Produced %d Items\n", tNum, produced);
+
 	return NULL;
 }
 
@@ -133,5 +160,4 @@ void shutDownFactoryLines()
 }
 
 #endif
-
 
