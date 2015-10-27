@@ -18,6 +18,7 @@
 int attempts = 0;
 int order_size = 0;
 int parts_remaining = 0;
+int total = 0;
 
 void getAddress()
 {
@@ -92,6 +93,7 @@ void getPaymentMethod()
 void dispatchFactoryLines()
 {
 	pthread_t tid1, tid2, tid3, tid4, tid5;
+	total = 0;
 
 	printf("Factory lines dispatched.\n");
 
@@ -115,6 +117,8 @@ void dispatchFactoryLines()
 	pthread_join(tid4, NULL);
 	pthread_join(tid5, NULL);
 
+	printf("\nTotal Items Produced: %d\n", total);
+
 }
 /*
  * Each thread will have its own random capacity and duration
@@ -136,28 +140,28 @@ void *factoryLines(void *arg)
 	do
 	{
 		numIters++;
-		sleep(duration);
 		if(capacity < parts_remaining)
 		{
 			produced += capacity;
+			parts_remaining -= capacity;
 		}
 		else
 		{
 			produced += parts_remaining;
+			parts_remaining = 0;
 		}
-		parts_remaining -= capacity;
+		sleep(duration);
 	}
 	while(parts_remaining > 0);
 
 	printf("Factory Line %d Total Iterations: %d\n", tNum, numIters);
 	printf("Factory Line %d Produced %d Items\n", tNum, produced);
-
+	total += produced;
 	return NULL;
 }
 
 void shutDownFactoryLines()
 {
-	//pthread_exit(NULL);
 	printf("Factory lines shutdown.\n");
 }
 
