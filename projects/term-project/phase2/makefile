@@ -1,11 +1,11 @@
 driver: driver.o statemodel.o actions.o state.o accepting.o processing.o manufacturing.o shipping.o
-	gcc driver.o statemodel.o actions.o state.o accepting.o processing.o manufacturing.o shipping.o -o driver
+	gcc driver.o statemodel.o actions.o state.o accepting.o processing.o manufacturing.o shipping.o -o driver -pthread
 
 driver.o: driver.c actions.h statemodel.h
 	gcc -c driver.c
 
 actions.o: actions.c actions.h
-	gcc -c actions.c -o actions.o
+	gcc -c actions.c -o actions.o -pthread
 
 statemodel.o: actions.h statemodel.h statemodel.c 
 	gcc -c statemodel.c
