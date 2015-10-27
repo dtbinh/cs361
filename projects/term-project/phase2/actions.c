@@ -14,11 +14,13 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <semaphore.h>
 
 int attempts = 0;
 int order_size = 0;
 int parts_remaining = 0;
 int total = 0;
+sem_t cntMutex;
 
 void getAddress()
 {
@@ -104,6 +106,8 @@ void dispatchFactoryLines()
 
 	parts_remaining = order_size;  //sets parts_remaining, which will be used to keep track of how long the threads will run
 
+	sem_init(&cntMutex, 0, 1);
+
 	//for(int ii = 0; ii < 5; ii++)
 	pthread_create(&tid1, NULL, factoryLines, (void *) 1);  //creates the 5 threads
 	pthread_create(&tid2, NULL, factoryLines, (void *) 2);
@@ -140,6 +144,7 @@ void *factoryLines(void *arg)
 	do
 	{
 		numIters++;
+		sem_wait(&cntMutex);
 		if(capacity < parts_remaining)
 		{
 			produced += capacity;
@@ -150,6 +155,7 @@ void *factoryLines(void *arg)
 			produced += parts_remaining;
 			parts_remaining = 0;
 		}
+		sem_post(&cntMutex);
 		sleep(duration);
 	}
 	while(parts_remaining > 0);
