@@ -101,7 +101,7 @@ void dispatchFactoryLines()
 
 	//sets the random seed value and assigns a random value to order_size between 1000-2000 (inclusively)
 	srandom(time(NULL));
-	order_size = (random() % 1000) + 1000;
+	order_size = (random() % 1001) + 1000;
 	printf("Order Size: %d\n", order_size);
 
 	parts_remaining = order_size;  //sets parts_remaining, which will be used to keep track of how long the threads will run
@@ -135,8 +135,8 @@ void *factoryLines(void *arg)
 	int numIters = 0;
 	int produced = 0;
 
-	capacity = (random() % 40) + 10;  //sets random capacity between 10-50
-	duration = (random() % 4) + 1;  //sets random duration between 1-5
+	capacity = (random() % 41) + 10;  //sets random capacity between 10-50
+	duration = (random() % 5) + 1;  //sets random duration between 1-5
 
 	printf("Factory Line %d Capacity: %d\n", tNum, capacity);
 	printf("Factory Line %d Duration: %d\n", tNum, duration);
