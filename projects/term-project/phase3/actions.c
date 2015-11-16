@@ -15,6 +15,8 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <semaphore.h>
+#include <sys/shm.h>
+#include <sys/stat.h>
 
 int attempts = 0;
 int order_size = 0;
@@ -81,7 +83,8 @@ int incrementAttempts()
 	{
 		int calc;
 		calc = (3-attempts);
-		printf("The maximum number of payment attempts is 3.  You only have %d attempts left!\n", calc);
+		printf("The maximum number of payment attempts is 3. "
+					 "You only have %d attempts left!\n", calc);
 	}
 
 	return attempts;
@@ -94,76 +97,100 @@ void getPaymentMethod()
 
 void dispatchFactoryLines()
 {
+	int shmid,
+			shmflg;
+	key_t shmkey;
+	shared_data *p;
+
+	int ii, capacity, duration;
 	pthread_t tid1, tid2, tid3, tid4, tid5;
+	pid_t pid;
+	char userprog[50];
 	total = 0;
+
+	shmkey = SHMEM_KEY ;
+	shmflg = IPC_CREAT | S_IRUSR | S_IWUSR  /* | IPC_EXCL */ ;
+
+	shmid = shmget( shmkey , SHMEM_SIZE , shmflg );
+
+	if (shmid == -1)
+	{
+		printf("\nFailed to create/find shared memory '0x%X'.\n", shmkey );
+		perror("Reason:");
+		exit(-1);
+	}
+
+	p = (shared_data *) shmat( shmid , NULL , 0 );
+	if (p == (shared_data *) -1)
+	{
+		printf ("\nFailed to attach shared memory id=%d\n" , shmid );
+		perror("Reason:");
+		exit(-1) ;
+	} 
 
 	printf("Factory lines dispatched.\n");
 
-	//sets the random seed value and assigns a random value to order_size between 1000-2000 (inclusively)
+	//sets the random seed value and assigns a random value to
+	//order_size between 1000-2000 (inclusively)
 	srandom(time(NULL));
 	order_size = (random() % 1001) + 1000;
 	printf("Order Size: %d\n", order_size);
 
-	parts_remaining = order_size;  //sets parts_remaining, which will be used to keep track of how long the threads will run
-
+	//sets parts_remaining, which will be used to keep track of how long the
+	//threads will run
+	parts_remaining = order_size;
 	sem_init(&cntMutex, 0, 1);
 
 	//for(int ii = 0; ii < 5; ii++)
-	pthread_create(&tid1, NULL, factoryLines, (void *) 1);  //creates the 5 threads
-	pthread_create(&tid2, NULL, factoryLines, (void *) 2);
-	pthread_create(&tid3, NULL, factoryLines, (void *) 3);
-	pthread_create(&tid4, NULL, factoryLines, (void *) 4);
-	pthread_create(&tid5, NULL, factoryLines, (void *) 5);
+	//creates the 5 threads
+  /* execlp child processes */
+	pid = fork();
+	switch (pid)
+	{
+		case -1:
+			perror("Fork failed");
+			exit(-1);
 
-	pthread_join(tid1, NULL); //waiting for each thread to finish
-	pthread_join(tid2, NULL);
-	pthread_join(tid3, NULL);
-	pthread_join(tid4, NULL);
-	pthread_join(tid5, NULL);
+		case 0:
+			if ( execlp("gnome-terminal", "superVterm", "-x", "/bin/bash",
+									"-c", "./supervisor 5", NULL) == -1 )
+			{
+				perror("Failed to exec tourist child process");
+				exit(-1);
+			}
 
+		default:
+			break;
+	}
+
+	for (ii = 1; ii <= 5; ii++)
+	{
+		pid = fork();
+		switch (pid)
+		{
+			case -1:
+				perror("Fork failed");
+				exit(-1);
+
+			case 0:
+				capacity = (random() % 41) + 10;  //sets random capacity between 10-50
+				duration = (random() % 5) + 1;  //sets random duration between 1-5
+				sprintf(userprog, "./factoryline.c %d %d, %d", ii, capacity, duration);
+				if ( execlp("gnome-terminal", "SuperVterm", "-x", "/bin/bash", "-c",
+										userprog, NULL) == -1 )
+				{
+					perror("Failed to exec tourist child process");
+					exit(-1);
+				}
+
+			default:
+				break;
+		}
+	}
+
+	sem_wait(&(p->factory_lines_finished));
 	printf("\nTotal Items Produced: %d\n", total);
 
-}
-/*
- * Each thread will have its own random capacity and duration
- */
-void *factoryLines(void *arg)
-{
-	int tNum = (int) arg;
-	int capacity;
-	int duration;
-	int numIters = 0;
-	int produced = 0;
-
-	capacity = (random() % 41) + 10;  //sets random capacity between 10-50
-	duration = (random() % 5) + 1;  //sets random duration between 1-5
-
-	printf("Factory Line %d Capacity: %d\n", tNum, capacity);
-	printf("Factory Line %d Duration: %d\n", tNum, duration);
-
-	do
-	{
-		numIters++;
-		sem_wait(&cntMutex);
-		if(capacity < parts_remaining)
-		{
-			produced += capacity;
-			parts_remaining -= capacity;
-		}
-		else
-		{
-			produced += parts_remaining;
-			parts_remaining = 0;
-		}
-		sem_post(&cntMutex);
-		sleep(duration);
-	}
-	while(parts_remaining > 0);
-
-	printf("Factory Line %d Total Iterations: %d\n", tNum, numIters);
-	printf("Factory Line %d Produced %d Items\n", tNum, produced);
-	total += produced;
-	return NULL;
 }
 
 void shutDownFactoryLines()
@@ -172,4 +199,3 @@ void shutDownFactoryLines()
 }
 
 #endif
-

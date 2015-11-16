@@ -1,6 +1,12 @@
 driver: driver.o statemodel.o actions.o state.o accepting.o processing.o manufacturing.o shipping.o
 	gcc driver.o statemodel.o actions.o state.o accepting.o processing.o manufacturing.o shipping.o -o driver -pthread
 
+factoryline: factoryline.c
+	gcc -c factoryline.c -o factoryline -pthread
+
+supervisor: supervisor.c
+	gcc -c supervisor.c -o supervisor -pthread
+
 driver.o: driver.c actions.h statemodel.h
 	gcc -c driver.c
 
@@ -27,3 +33,6 @@ shipping.o: state.h shipping.h shipping.c
 
 clean:
 	rm *.o ; rm driver 
+
+all:
+	make driver && make factoryline && make supervisor
