@@ -3,26 +3,26 @@
 #include <errno.h>
 #include <sys/shm.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include "shmem.h"
+#include "message.h"
 
-int main( int argc , char *argv[] )
+int
+main( int argc , char *argv[] )
 {
-	int shmid, shmflg;
+	int shmid, shmflg, capacity, line_number, num_iters, produced, duration;
 	key_t shmkey;
 	shared_data *p;
-	/* User arguments */
-	int factoryID, capacity;
-	double duration;
 
-	int line_number = atoi(argv[0]);
-	int numIters = 0;
-	int produced = 0;
-	capacity = atoi(argv[1]);
-	duration = atol(argv[2]);
+	capacity = atoi(argv[2]);
+	line_number = atoi(argv[1]);
+	num_iters = 0;
+	produced = 0;
+	duration = atoi(argv[3]);
 
-	shmkey = SHMEM_KEY ;
-	shmflg = IPC_CREAT | S_IRUSR | S_IWUSR  /* | IPC_EXCL */ ;
+	shmkey = SHMEM_KEY;
+	shmflg = IPC_CREAT | S_IRUSR | S_IWUSR  /* | IPC_EXCL */;
 
 	shmid = shmget( shmkey , SHMEM_SIZE , shmflg );
 
@@ -40,84 +40,61 @@ int main( int argc , char *argv[] )
 		perror("Reason");
 		exit(-1) ;
 	} 
+  
+  /* Create / Find the message queues */
+  msgQueKey = BASE_MAILBOX_NAME ;
+  queID = msgget( msgQueKey , IPC_CREAT | 0600 ) ; /*rw. ... ...*/
+  if ( queID < 0 )
+  {
+    printf("Failed to create mailbox %X. Error code=%d\n", msgQueKey , errno ) ;
+    exit(-2) ;
+  }
 
-	/*
-	// Initialize both rendezvous semaphores
-	// in the shared memory /   
-	if( sem_init(&(p->client), 1, 0) )
-	{
-		perror("Failed to init client's semaphore");
-		exit(-1) ;     
-	}
-	if(sem_init(&(p->server), 1, 0 ))
-	{
-		perror("Failed to init server's semaphore") ;
-		exit(-1);
-	}
+  /* prepare a message to send to the Calculator process */
+  msg1.mtype = 1; /* this is a "Request" message type */
+  msg1.info.sender = getpid();
+  msg1.info.num1 = 15;
+  msg1.info.num2 = 6;
+  msg1.info.operation = '*';
+  
+  /* Send one message to the Calculator process */
+  msgStatus = msgsnd( queID , &msg1 , MSG_INFO_SIZE , 0 ) ; /* the msg flag is set to 0 */
+  if ( msgStatus < 0 )
+  {
+    printf("Failed to send message to Calculator process on queuID %d. Error code=%d\n" , queID , errno ) ;
+    exit(-2) ;
+  }
+  else
+  {
+    printMsg( & msg1 );
+  }
 
-	/ write to shared mem /
-	p->d1 = atof( argv[1] );
-
-	// awaken server       /
-	if (sem_post(&(p->client)))
-	{
-		perror("Failed to post client's semaphore ");
-		exit(-1);
-	}
-	printf("Cliet posted its semaphore\n");
-	printf("Cliet now waits for server\n");
-
-	if(sem_wait(&(p->server)))  / wait for server /
-	{
-		perror("Failed to wait for server's semaphore");
-		exit(-1);
-	}
-
-	printf ("\nd1=%8.3f, d2=%8.3f\n", p->d1, p->d2 );
-
-	// Destroy the shared semaphores. ONLY one process does it /
-	if(sem_destroy(&(p->client)))
-	{
-		perror("Failed to destroy client's semaphore");
-		exit(-1);
-	}
-
-	if(sem_destroy(&(p->server)))
-	{
-		perror("Failed to destroy server's semaphore");
-		exit(-1);
-	}
-
-	// Destroy the shared memory segment /     
-	shmdt(p);
-	shmctl(shmid, IPC_RMID, NULL);
-	printf("Client -- Goodbye\n");   
-	*/
-	
 	printf("Factory Line %d Capacity: %d\n", line_number, capacity);
 	printf("Factory Line %d Duration: %d\n", line_number, duration);
 
 	do
 	{
-		numIters++;
-		sem_wait(&cntMutex);
-		if(capacity < parts_remaining)
+		num_iters++;
+		sem_wait(&(p->cntMutex));
+		if(capacity < p->parts_remaining)
 		{
 			produced += capacity;
-			parts_remaining -= capacity;
+			p->parts_remaining -= capacity;
 		}
 		else
 		{
-			produced += parts_remaining;
-			parts_remaining = 0;
+			produced += p->parts_remaining;
+			p->parts_remaining = 0;
 		}
-		sem_post(&cntMutex);
+		sem_post(&(p->cntMutex));
 		sleep(duration);
 	}
-	while(parts_remaining > 0);
-
-	printf("Factory Line %d Total Iterations: %d\n", line_number, numIters);
+	while(p->parts_remaining > 0);
+	p->lines_active--;
+	printf("Factory Line %d Total Iterations: %d\n", line_number, num_iters);
 	printf("Factory Line %d Produced %d Items\n", line_number, produced);
-	total += produced;
+	p->total += produced;
+  // post semaphore to wake up parent if all work is done
+	if (p->lines_active < 1) sem_post(&(p->factory_lines_finished));
 	return 0;
 }

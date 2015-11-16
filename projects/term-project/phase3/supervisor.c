@@ -5,17 +5,14 @@
 #include <sys/stat.h>
 
 #include "shmem.h"
+#include "message.h"
 
 int main( int argc , char *argv[] )
 {
-	int shmid,
-			shmflg;
-	key_t shmkey;
+	int shmid, shmflg, queID, msgStatus;
+	key_t shmkey, msgQueKey;
 	shared_data *p;
-	/* User arguments */
-	int factoryID,
-			capactiy;
-	double duration;
+	msgBuf msg;
 
 	shmkey = SHMEM_KEY ;
 	shmflg = IPC_CREAT | S_IRUSR | S_IWUSR  /* | IPC_EXCL */ ;
@@ -36,58 +33,30 @@ int main( int argc , char *argv[] )
 		perror("Reason:");
 		exit(-1) ;
 	} 
+  
+  /* Create / Find the message queues */
+  msgQueKey = BASE_MAILBOX_NAME ;
+  queID = msgget( msgQueKey , IPC_CREAT | 0600 ) ; /*rw. ... ...*/
+  if ( queID < 0 )
+  {
+    printf("Failed to create mailbox %X. Error code=%d\n", msgQueKey , errno ) ;
+    exit(-2) ;
+  }
+  
+  /* Now, wait for a message to arrive from the User process */
+  msgStatus = msgrcv( queID , &msg , MSG_INFO_SIZE , 1 , 0 );
+  if ( msgStatus < 0 )
+  {
+    printf("Failed to receive message from User process on queuID %d. Error code=%d\n"
+        , queID , errno ) ;
+    exit(-2) ;
+  }
+  else
+  {
+    printf("Calculator received the following message from the User:\n" );
+    printMsg( & msg );
+    printf("\n");
+  }
 
-	/*
-	// Initialize both rendezvous semaphores
-	// in the shared memory /   
-	if( sem_init(&(p->client), 1, 0) )
-	{
-		perror("Failed to init client's semaphore");
-		exit(-1) ;     
-	}
-	if(sem_init(&(p->server), 1, 0 ))
-	{
-		perror("Failed to init server's semaphore") ;
-		exit(-1);
-	}
-
-	/ write to shared mem /
-	p->d1 = atof( argv[1] );
-
-	// awaken server       /
-	if (sem_post(&(p->client)))
-	{
-		perror("Failed to post client's semaphore ");
-		exit(-1);
-	}
-	printf("Cliet posted its semaphore\n");
-	printf("Cliet now waits for server\n");
-
-	if(sem_wait(&(p->server)))  / wait for server /
-	{
-		perror("Failed to wait for server's semaphore");
-		exit(-1);
-	}
-
-	printf ("\nd1=%8.3f, d2=%8.3f\n", p->d1, p->d2 );
-
-	// Destroy the shared semaphores. ONLY one process does it /
-	if(sem_destroy(&(p->client)))
-	{
-		perror("Failed to destroy client's semaphore");
-		exit(-1);
-	}
-
-	if(sem_destroy(&(p->server)))
-	{
-		perror("Failed to destroy server's semaphore");
-		exit(-1);
-	}
-
-	// Destroy the shared memory segment /     
-	shmdt(p);
-	shmctl(shmid, IPC_RMID, NULL);
-	printf("Client -- Goodbye\n");   
-	*/
 	return 0;
 }

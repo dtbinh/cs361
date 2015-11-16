@@ -20,9 +20,6 @@
 
 int attempts = 0;
 int order_size = 0;
-int parts_remaining = 0;
-int total = 0;
-sem_t cntMutex;
 
 void getAddress()
 {
@@ -106,7 +103,6 @@ void dispatchFactoryLines()
 	pthread_t tid1, tid2, tid3, tid4, tid5;
 	pid_t pid;
 	char userprog[50];
-	total = 0;
 
 	shmkey = SHMEM_KEY ;
 	shmflg = IPC_CREAT | S_IRUSR | S_IWUSR  /* | IPC_EXCL */ ;
@@ -130,6 +126,10 @@ void dispatchFactoryLines()
 
 	printf("Factory lines dispatched.\n");
 
+	p->parts_remaining = 0;
+	p->total = 0;
+	p->lines_active = 5;
+
 	//sets the random seed value and assigns a random value to
 	//order_size between 1000-2000 (inclusively)
 	srandom(time(NULL));
@@ -138,12 +138,15 @@ void dispatchFactoryLines()
 
 	//sets parts_remaining, which will be used to keep track of how long the
 	//threads will run
-	parts_remaining = order_size;
-	sem_init(&cntMutex, 0, 1);
+	p->parts_remaining = order_size;
+	sem_init(&(p->cntMutex), 1, 1);
+	sem_init(&(p->factory_lines_finished), 1, 0);
 
 	//for(int ii = 0; ii < 5; ii++)
 	//creates the 5 threads
   /* execlp child processes */
+
+	// Create supervisor process
 	pid = fork();
 	switch (pid)
 	{
@@ -155,16 +158,19 @@ void dispatchFactoryLines()
 			if ( execlp("gnome-terminal", "superVterm", "-x", "/bin/bash",
 									"-c", "./supervisor 5", NULL) == -1 )
 			{
-				perror("Failed to exec tourist child process");
+				perror("Failed to exec supervisor process");
 				exit(-1);
 			}
 
 		default:
 			break;
 	}
-
+	
+	// Create 5 factory line processes
 	for (ii = 1; ii <= 5; ii++)
 	{
+		capacity = (random() % 41) + 10;  //sets random capacity between 10-50
+		duration = (random() % 5) + 1;  //sets random duration between 1-5
 		pid = fork();
 		switch (pid)
 		{
@@ -173,13 +179,11 @@ void dispatchFactoryLines()
 				exit(-1);
 
 			case 0:
-				capacity = (random() % 41) + 10;  //sets random capacity between 10-50
-				duration = (random() % 5) + 1;  //sets random duration between 1-5
-				sprintf(userprog, "./factoryline.c %d %d, %d", ii, capacity, duration);
+				sprintf(userprog, "./factoryline %d %d %d", ii, capacity, duration);
 				if ( execlp("gnome-terminal", "SuperVterm", "-x", "/bin/bash", "-c",
 										userprog, NULL) == -1 )
 				{
-					perror("Failed to exec tourist child process");
+					perror("Failed to exec factoryline process");
 					exit(-1);
 				}
 
@@ -189,7 +193,7 @@ void dispatchFactoryLines()
 	}
 
 	sem_wait(&(p->factory_lines_finished));
-	printf("\nTotal Items Produced: %d\n", total);
+	printf("\nTotal Items Produced: %d\n", p->total);
 
 }
 
