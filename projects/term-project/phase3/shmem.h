@@ -1,7 +1,7 @@
 #include <semaphore.h>
 
 typedef struct {
-	sem_t factory_lines_finished, cntMutex;
+	sem_t factory_lines_finished, print_aggregates, cntMutex;
 	int lines_active, parts_remaining, total;
 } shared_data;
 

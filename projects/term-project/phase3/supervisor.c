@@ -43,6 +43,24 @@ int main( int argc , char *argv[] )
     exit(-2) ;
   }
   
+  p->lines_active = 5;
+
+  while (0 < p -> lines_active)
+  {
+
+  }
+
+	if (sem_post(&(p->factory_lines_finished)))
+  {
+    perror("Failed to post factory_lines_finished semaphore");
+    exit(-1);
+  }
+
+	if (sem_wait(&(p->print_aggregates)))
+  {
+    perror("Failed to post factory_lines_finished semaphore");
+    exit(-1);
+  }
   /* Now, wait for a message to arrive from the User process */
   msgStatus = msgrcv( queID , &msg , MSG_INFO_SIZE , 1 , 0 );
   if ( msgStatus < 0 )

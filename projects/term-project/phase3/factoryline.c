@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
 #include <sys/shm.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -11,8 +14,11 @@
 int
 main( int argc , char *argv[] )
 {
-	int shmid, shmflg, capacity, line_number, num_iters, produced, duration;
-	key_t shmkey;
+	int shmid, shmflg,
+      queID, msgStatus,
+      capacity, line_number, num_iters, produced, duration;
+  msgBuf msg;
+	key_t shmkey, msgQueKey;
 	shared_data *p;
 
 	capacity = atoi(argv[2]);
@@ -51,22 +57,20 @@ main( int argc , char *argv[] )
   }
 
   /* prepare a message to send to the Calculator process */
-  msg1.mtype = 1; /* this is a "Request" message type */
-  msg1.info.sender = getpid();
-  msg1.info.num1 = 15;
-  msg1.info.num2 = 6;
-  msg1.info.operation = '*';
+  msg.mtype = 1; /* this is a "production" message type */
+  msg.info.sender = getpid();
+  msg.info.capacity = capacity;
+  msg.info.duration = duration;
+  msg.info.line_number = line_number;
+  msg.info.num_iters = num_iters;
+  msg.info.produced = produced;
   
-  /* Send one message to the Calculator process */
-  msgStatus = msgsnd( queID , &msg1 , MSG_INFO_SIZE , 0 ) ; /* the msg flag is set to 0 */
+  /* Send one message to the Supervisor process */
+  msgStatus = msgsnd( queID , &msg , MSG_INFO_SIZE , 0 ) ; /* the msg flag is set to 0 */
   if ( msgStatus < 0 )
   {
     printf("Failed to send message to Calculator process on queuID %d. Error code=%d\n" , queID , errno ) ;
-    exit(-2) ;
-  }
-  else
-  {
-    printMsg( & msg1 );
+    exit(-2);
   }
 
 	printf("Factory Line %d Capacity: %d\n", line_number, capacity);
@@ -89,12 +93,9 @@ main( int argc , char *argv[] )
 		sem_post(&(p->cntMutex));
 		sleep(duration);
 	}
-	while(p->parts_remaining > 0);
-	p->lines_active--;
 	printf("Factory Line %d Total Iterations: %d\n", line_number, num_iters);
 	printf("Factory Line %d Produced %d Items\n", line_number, produced);
 	p->total += produced;
   // post semaphore to wake up parent if all work is done
-	if (p->lines_active < 1) sem_post(&(p->factory_lines_finished));
 	return 0;
 }

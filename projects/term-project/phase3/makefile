@@ -9,7 +9,7 @@ factoryline: factoryline.o
 supervisor: supervisor.o
 	gcc supervisor.o -o supervisor -pthread
 
-factoryline.o: factoryline.c
+factoryline.o: factoryline.c message.h
 	gcc -c factoryline.c -o factoryline.o -pthread
 
 supervisor.o: supervisor.c

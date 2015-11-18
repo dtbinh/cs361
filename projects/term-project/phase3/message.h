@@ -1,13 +1,15 @@
 #include <sys/types.h>
 #define MAXNAMELEN 20
 typedef struct {
-	long mtype ; 			/* 1: request , 2: reply */
+	long mtype ; 			/* 1: production , 2: termination */
 
 	struct {
-	pid_t sender; 		/* ID of sending process */
-	int capactiy, duration, line_number, num_iters, produced;
-	char operation; 	/* arithmetic operation '+' , '-' , '*' */
-	int result; 			/* result of num1 operation num2 */
+    pid_t sender; 		/* ID of sending process */
+    int capacity,
+        duration,
+        line_number,
+        num_iters,
+        produced;
 	} info; 
 } msgBuf ;
 

@@ -128,7 +128,6 @@ void dispatchFactoryLines()
 
 	p->parts_remaining = 0;
 	p->total = 0;
-	p->lines_active = 5;
 
 	//sets the random seed value and assigns a random value to
 	//order_size between 1000-2000 (inclusively)
@@ -139,9 +138,21 @@ void dispatchFactoryLines()
 	//sets parts_remaining, which will be used to keep track of how long the
 	//threads will run
 	p->parts_remaining = order_size;
-	sem_init(&(p->cntMutex), 1, 1);
-	sem_init(&(p->factory_lines_finished), 1, 0);
+	if (sem_init(&(p->cntMutex), 1, 1))
+  {
+    perror("Failed to init cntMutex semaphore");
+    exit(-1);
+  }
 
+	if (sem_init(&(p->factory_lines_finished), 1, 0))
+  {
+    perror("Failed to init factory_lines_finished semaphore");
+    exit(-1);
+  }
+
+	if (sem_init(&(p-> print_aggregates), 1, 0))
+  {
+    perror("Failed to init print_aggregates semaphore"); exit(-1); } 
 	//for(int ii = 0; ii < 5; ii++)
 	//creates the 5 threads
   /* execlp child processes */
@@ -192,7 +203,18 @@ void dispatchFactoryLines()
 		}
 	}
 
-	sem_wait(&(p->factory_lines_finished));
+	if (sem_wait(&(p->factory_lines_finished)))
+  {
+    perror("Failed to wait for factory_lines_finished semapohre");
+    exit(-1);
+  }
+
+	if (sem_wait(&(p->print_aggregates)))
+  {
+    perror("Failed to wait for print_aggregates semapohre");
+    exit(-1);
+  }
+
 	printf("\nTotal Items Produced: %d\n", p->total);
 
 }

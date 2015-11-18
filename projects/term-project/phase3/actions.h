@@ -30,7 +30,7 @@ typedef enum
 void getAddress();
 void chargeClient();
 void startWarranty();
-void update_stats(stats value);
+void updateStats(stats value);
 void refund();
 void resetAttempts();
 int incrementAttempts();
