@@ -10,7 +10,7 @@ printMsg(msgBuf *m)
 {
   if (m->mtype == 1)
   {
-    printf("factory_ID: %d capacity: %d num_parts: %d duration: %d\n");
+    printf("factory_ID: %d capacity: %d num_parts: %d duration: %d\n", m->info.factory_ID);
   }
   else if (m->mtype == 2)
   {

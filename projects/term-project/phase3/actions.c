@@ -152,12 +152,12 @@ void dispatchFactoryLines()
 
 	if (sem_init(&(p-> print_aggregates), 1, 0))
   {
-    perror("Failed to init print_aggregates semaphore"); exit(-1); } 
-	//for(int ii = 0; ii < 5; ii++)
-	//creates the 5 threads
+    perror("Failed to init print_aggregates semaphore"); exit(-1);
+  } 
+
   /* execlp child processes */
 
-	// Create supervisor process
+	/* Create supervisor process */
 	pid = fork();
 	switch (pid)
 	{
@@ -209,14 +209,11 @@ void dispatchFactoryLines()
     exit(-1);
   }
 
-	if (sem_wait(&(p->print_aggregates)))
+	if (sem_post(&(p->print_aggregates)))
   {
-    perror("Failed to wait for print_aggregates semapohre");
+    perror("Failed to post for print_aggregates semapohre");
     exit(-1);
   }
-
-	printf("\nTotal Items Produced: %d\n", p->total);
-
 }
 
 void shutDownFactoryLines()

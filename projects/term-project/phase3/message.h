@@ -5,11 +5,13 @@ typedef struct {
 
 	struct {
     pid_t sender; 		/* ID of sending process */
-    int capacity,
+    int factory_ID,
+        capacity,
+        num_parts,
         duration,
-        line_number,
         num_iters,
-        produced;
+        produced,
+        is_done;
 	} info; 
 } msgBuf ;
 

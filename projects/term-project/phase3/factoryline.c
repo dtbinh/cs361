@@ -16,16 +16,16 @@ main( int argc , char *argv[] )
 {
 	int shmid, shmflg,
       queID, msgStatus,
-      capacity, line_number, num_iters, produced, duration;
+      produced, capacity, factory_ID, num_iters,  duration;
   msgBuf msg;
 	key_t shmkey, msgQueKey;
 	shared_data *p;
 
+	factory_ID = atoi(argv[1]);
 	capacity = atoi(argv[2]);
-	line_number = atoi(argv[1]);
-	num_iters = 0;
-	produced = 0;
 	duration = atoi(argv[3]);
+	num_iters = 0;
+  produced = 0;
 
 	shmkey = SHMEM_KEY;
 	shmflg = IPC_CREAT | S_IRUSR | S_IWUSR  /* | IPC_EXCL */;
@@ -56,26 +56,6 @@ main( int argc , char *argv[] )
     exit(-2) ;
   }
 
-  /* prepare a message to send to the Calculator process */
-  msg.mtype = 1; /* this is a "production" message type */
-  msg.info.sender = getpid();
-  msg.info.capacity = capacity;
-  msg.info.duration = duration;
-  msg.info.line_number = line_number;
-  msg.info.num_iters = num_iters;
-  msg.info.produced = produced;
-  
-  /* Send one message to the Supervisor process */
-  msgStatus = msgsnd( queID , &msg , MSG_INFO_SIZE , 0 ) ; /* the msg flag is set to 0 */
-  if ( msgStatus < 0 )
-  {
-    printf("Failed to send message to Calculator process on queuID %d. Error code=%d\n" , queID , errno ) ;
-    exit(-2);
-  }
-
-	printf("Factory Line %d Capacity: %d\n", line_number, capacity);
-	printf("Factory Line %d Duration: %d\n", line_number, duration);
-
 	do
 	{
 		num_iters++;
@@ -84,18 +64,52 @@ main( int argc , char *argv[] )
 		{
 			produced += capacity;
 			p->parts_remaining -= capacity;
+      msg.info.num_parts = capacity;
 		}
 		else
 		{
 			produced += p->parts_remaining;
 			p->parts_remaining = 0;
+      msg.info.num_parts = p->parts_remaining;
 		}
+
+    /* prepare a message to send to the Supervisor process */
+    msg.mtype = 1; /* this is a "production" message type */
+    msg.info.sender = getpid();
+    msg.info.factory_ID = factory_ID;
+    msg.info.capacity = capacity;
+    msg.info.duration = duration;
+    msg.info.is_done = 0;
+  
+    /* Send one message to the Supervisor process */
+    msgStatus = msgsnd( queID , &msg , MSG_INFO_SIZE , 0 ) ; /* the msg flag is set to 0 */
+    if ( msgStatus < 0 )
+    {
+      printf("Failed to send message to Supervisor process on queuID %d. Error code=%d\n" ,
+          queID , errno ) ;
+      exit(-2);
+    }
+
 		sem_post(&(p->cntMutex));
 		sleep(duration);
-	}
-	printf("Factory Line %d Total Iterations: %d\n", line_number, num_iters);
-	printf("Factory Line %d Produced %d Items\n", line_number, produced);
-	p->total += produced;
-  // post semaphore to wake up parent if all work is done
+	} while (0 < p->parts_remaining);
+  
+  /* Build the termaination message */
+  msg.mtype = 1;
+  msg.info.sender = getpid();
+  msg.info.factory_ID = factory_ID;
+  msg.info.num_iters = num_iters;
+  msg.info.produced = produced;
+  msg.info.is_done = 1;
+
+  /* Send one message to the Supervisor process */
+  msgStatus = msgsnd(queID , &msg , MSG_INFO_SIZE , 0); /* the msg flag is set to 0 */
+  if ( msgStatus < 0 )
+  {
+    printf("Failed to send message to Supervisor process on queuID %d. Error code=%d\n",
+        queID , errno );
+    exit(-2);
+  }
+
 	return 0;
 }
