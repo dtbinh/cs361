@@ -94,21 +94,10 @@ void getPaymentMethod()
 
 void dispatchFactoryLines()
 {
-	int ii, capacity, duration;
+	int ii;
+	pid_t pid;
+
 	printf("Factory lines dispatched.\n");
-
-	p->parts_remaining = 0;
-	p->total = 0;
-
-	//sets the random seed value and assigns a random value to
-	//order_size between 1000-2000 (inclusively)
-	srandom(time(NULL));
-	order_size = (random() % 1001) + 1000;
-	printf("Order Size: %d\n", order_size);
-
-	//sets parts_remaining, which will be used to keep track of how long the
-	//threads will run
-	p->parts_remaining = order_size;
 
 	/* Create supervisor process */
 	pid = fork();
@@ -129,44 +118,6 @@ void dispatchFactoryLines()
 		default:
 			break;
 	}
-	
-	// Create 5 factory line processes
-	for (ii = 1; ii <= 5; ii++)
-	{
-		capacity = (random() % 41) + 10;  //sets random capacity between 10-50
-		duration = (random() % 5) + 1;  //sets random duration between 1-5
-		pid = fork();
-		switch (pid)
-		{
-			case -1:
-				perror("Fork failed");
-				exit(-1);
-
-			case 0:
-				sprintf(userprog, "./factoryline %d %d %d", ii, capacity, duration);
-				if ( execlp("gnome-terminal", "SuperVterm", "-x", "/bin/bash", "-c",
-										userprog, NULL) == -1 )
-				{
-					perror("Failed to exec factoryline process");
-					exit(-1);
-				}
-
-			default:
-				break;
-		}
-	}
-
-	if (sem_wait(&(p->factory_lines_finished)))
-  {
-    perror("Failed to wait for factory_lines_finished semapohre");
-    exit(-1);
-  }
-
-	if (sem_post(&(p->print_aggregates)))
-  {
-    perror("Failed to post for print_aggregates semapohre");
-    exit(-1);
-  }
 }
 
 void shutDownFactoryLines()

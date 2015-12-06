@@ -42,22 +42,25 @@ int main(int argc, char *argv[])
   sock = serverUDPsock(port);
   lines_active = 0;
 	order_size = (random() % 1001) + 1000;
-  capacity = (random() % 41) + 10;  //sets random capacity between 10-50
-  duration = (random() % 5) + 1;  //sets random duration between 1-5
   
   while (1) 
     {
       alen = sizeof(fsin);
-      //`fprintf(stderr , "DAYTIME server waiting\n" ) ;        
 
       if ( recvfrom( sock, buf, MAXBUFLEN , 0, (SA *) &fsin, &alen ) < 0 )
-        err_sys( "recvfrom" ) ;
+        err_sys( "recvfrom" );
 
       fprintf(stderr , "DAYTIME server received '%s'\n" , buf ) ;
       if (strcmp(buf, "start") == 0)    /* Factory line is ready to begin */
         {
+          lines_active++;
+          duration = (random() % 5) + 1;    //sets random duration between 1-5
+          capacity = (random() % 41) + 10;  //sets random capacity between 10-50
+
           sendto( sock , (char *) &timeStr , strlen(timeStr) , 0 ,
                  (SA *) &fsin, alen );
+          duration = -1;
+          capactiy = -1;
         }
       
       time( &now ); /* get the current system's time */

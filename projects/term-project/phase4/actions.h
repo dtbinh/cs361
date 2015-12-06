@@ -7,7 +7,6 @@
 
 #ifndef ACTIONS_H_
 #define ACTIONS_H_
-#include "shmem.h"
 
 typedef enum
 {

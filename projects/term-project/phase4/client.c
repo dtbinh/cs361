@@ -1,4 +1,5 @@
 #include <sys/types.h>
+#include <sys/socket.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,10 +42,9 @@ int main(int argc, char *argv[])
     
     fprintf(stderr , "DAYTIME client sending '%s'\n" , msg ) ;
     /* must send the \0 at end of msg, too */
-    sendto( s, (void *) msg, strlen(msg)+1 , NULL , 0);
+    sendto( s, (void *) msg, strlen(msg)+1, 0, NULL, 0);
     
-    
-    n = recvfrom( s, (void*) timeStr , MAXBUFLEN , NULL , 0 );
+    n = recvfrom( s, (void*) timeStr, MAXBUFLEN, 0, NULL , 0 );
     if ( n <= 0 )
         err_sys( "Failed to get the daytime from the server" );
 
