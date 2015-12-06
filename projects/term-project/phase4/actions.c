@@ -94,36 +94,7 @@ void getPaymentMethod()
 
 void dispatchFactoryLines()
 {
-	int shmid,
-			shmflg;
-	key_t shmkey;
-	shared_data *p;
-
 	int ii, capacity, duration;
-	pthread_t tid1, tid2, tid3, tid4, tid5;
-	pid_t pid;
-	char userprog[50];
-
-	shmkey = SHMEM_KEY ;
-	shmflg = IPC_CREAT | S_IRUSR | S_IWUSR  /* | IPC_EXCL */ ;
-
-	shmid = shmget( shmkey , SHMEM_SIZE , shmflg );
-
-	if (shmid == -1)
-	{
-		printf("\nFailed to create/find shared memory '0x%X'.\n", shmkey );
-		perror("Reason:");
-		exit(-1);
-	}
-
-	p = (shared_data *) shmat( shmid , NULL , 0 );
-	if (p == (shared_data *) -1)
-	{
-		printf ("\nFailed to attach shared memory id=%d\n" , shmid );
-		perror("Reason:");
-		exit(-1) ;
-	} 
-
 	printf("Factory lines dispatched.\n");
 
 	p->parts_remaining = 0;
@@ -138,24 +109,6 @@ void dispatchFactoryLines()
 	//sets parts_remaining, which will be used to keep track of how long the
 	//threads will run
 	p->parts_remaining = order_size;
-	if (sem_init(&(p->cntMutex), 1, 1))
-  {
-    perror("Failed to init cntMutex semaphore");
-    exit(-1);
-  }
-
-	if (sem_init(&(p->factory_lines_finished), 1, 0))
-  {
-    perror("Failed to init factory_lines_finished semaphore");
-    exit(-1);
-  }
-
-	if (sem_init(&(p-> print_aggregates), 1, 0))
-  {
-    perror("Failed to init print_aggregates semaphore"); exit(-1);
-  } 
-
-  /* execlp child processes */
 
 	/* Create supervisor process */
 	pid = fork();
@@ -167,7 +120,7 @@ void dispatchFactoryLines()
 
 		case 0:
 			if ( execlp("gnome-terminal", "superVterm", "-x", "/bin/bash",
-									"-c", "./supervisor 5", NULL) == -1 )
+									"-c", "./server 5", NULL) == -1 )
 			{
 				perror("Failed to exec supervisor process");
 				exit(-1);

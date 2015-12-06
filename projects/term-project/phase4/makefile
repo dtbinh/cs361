@@ -1,25 +1,25 @@
-all: driver factoryline supervisor
+all: driver client server
 
 driver: driver.o statemodel.o actions.o state.o accepting.o processing.o manufacturing.o shipping.o
-	gcc driver.o statemodel.o actions.o state.o accepting.o processing.o manufacturing.o shipping.o -o driver -pthread
+	gcc driver.o statemodel.o actions.o state.o accepting.o processing.o manufacturing.o shipping.o -o driver 
 
-factoryline: factoryline.o
-	gcc factoryline.o -o factoryline -pthread
+client: client.o
+	gcc client.o -o client 
 
-supervisor: supervisor.o
-	gcc supervisor.o -o supervisor -pthread
+server: server.o
+	gcc server.o -o server 
 
-factoryline.o: factoryline.c message.h
-	gcc -c factoryline.c -o factoryline.o -pthread
+client.o: client.c message.h
+	gcc -c client.c -o client.o 
 
-supervisor.o: supervisor.c
-	gcc -c supervisor.c -o supervisor.o -pthread
+server.o: server.c
+	gcc -c server.c -o server.o 
 
 driver.o: driver.c actions.h statemodel.h
 	gcc -c driver.c
 
 actions.o: actions.c actions.h
-	gcc -c actions.c -o actions.o -pthread
+	gcc -c actions.c -o actions.o 
 
 statemodel.o: actions.h statemodel.h statemodel.c 
 	gcc -c statemodel.c
@@ -40,5 +40,5 @@ shipping.o: state.h shipping.h shipping.c
 	gcc -c shipping.c
 
 clean:
-	rm *.o ; rm driver ; rm factoryline ; rm supervisor
+	rm *.o ; rm driver ; rm client ; rm server
 
