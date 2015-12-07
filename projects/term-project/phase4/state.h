@@ -1,8 +1,8 @@
 /*
  * state.h
  *
- * Modified on: Oct 26, 2015
- *      Author: Joshua Lyons and Conner Turnbull
+ * Modified on: Dec 6, 2015
+ *      Author: Joshua Lyons and Conner Turnbull (Group 1)
  */
 
 #ifndef STATE_H_
@@ -20,11 +20,11 @@ struct state {
 	event_handler*	manufacturing_completed;
 	event_handler*	recieved_package;
 	event_handler*	lost_package;
-	action*		entry_to;
-	action*		exit_from;
+	action*			entry_to;
+	action*			exit_from;
 };
 
 extern state_t*	default_event_handler();
-extern void	default_action();
+extern void		default_action();
 
 #endif
