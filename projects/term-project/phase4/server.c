@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 	while(curLines > 0) {
 			if (msg.data.quit == 1)
 			{
-				iters[msg.info.id - 1]++;
+				iters[msg.data.id - 1]++;
 				cap[msg.data.id - 1] = msg.data.cap;
 				dur[msg.data.id - 1] = msg.data.dur;
 				prod[msg.data.id - 1] += msg.data.prod;
