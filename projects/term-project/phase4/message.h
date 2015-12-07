@@ -8,14 +8,19 @@
 #define MESSAGE_H_
 
 #include <sys/types.h>
-#include <semaphore.h>
 
 #define MAXNAMELEN 20
 
-typedef struct {
+typedef struct
+{
 	long mestype;
-	struct {
-		int id, quit, cap, prod, dur;
+	struct
+	{
+		int id;
+		int quit;
+		int cap;
+		int prod;
+		int dur;
 	} data;
 } msgBuffer;
 
