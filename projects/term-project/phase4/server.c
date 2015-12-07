@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
   time_t	now;                /* current time                 */
   char    timeStr[MAXBUFLEN]; /* time string   */
   unsigned int    alen;       /* from-address length          */
-	int ii, capacity, duration, lines_active;
+	int ii, order_size, capacity, duration, lines_active;
   
   switch (argc) 
     {
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
           sendto( sock , (char *) &timeStr , strlen(timeStr) , 0 ,
                  (SA *) &fsin, alen );
           duration = -1;
-          capactiy = -1;
+          capacity = -1;
         }
       
       time( &now ); /* get the current system's time */
