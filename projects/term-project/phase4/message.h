@@ -6,7 +6,7 @@
  */
 #ifndef MESSAGE_H_
 #define MESSAGE_H_
- 
+
 #include <sys/types.h>
 #include <semaphore.h>
 
@@ -22,6 +22,6 @@ typedef struct {
 #define MSG_INFO_SIZE ( sizeof(msgBuf) - sizeof(long))
 #define BASE_MAILBOX_NAME 0x32
 
-void printMsg( msgBuf *m);
+void printMsg( msgBuffer *m);
 
 #endif
