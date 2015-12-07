@@ -1,8 +1,8 @@
 /*
  * manufacturing.h
  *
- * Modified on: Oct 26, 2015
- *      Author: Joshua Lyons and Conner Turnbull
+ * Modified on: Dec 6, 2015
+ *      Author: Joshua Lyons and Conner Turnbull (Group 1)
  */
 
 #ifndef MANUFACTURING_H_
@@ -17,4 +17,3 @@ static void		entry_to();
 static void		exit_from();
 
 #endif
-
