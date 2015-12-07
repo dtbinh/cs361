@@ -1,7 +1,7 @@
 /*
  * actions.c
  *
- * Modified on: Oct 26, 2015
+ * Modified on: Dec 6, 2015
  *      Author: Joshua Lyons and Conner Turnbull (Group 1)
  */
 
@@ -9,14 +9,16 @@
 #define ACTIONS_C_
 
 #include <stdio.h>
+#include "mySock.h"
 #include "actions.h"
 #include <time.h>
 #include <stdlib.h>
-#include <pthread.h>
 #include <unistd.h>
-#include <semaphore.h>
 #include <sys/shm.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
 int attempts = 0;
 int order_size = 0;
@@ -92,37 +94,110 @@ void getPaymentMethod()
 	printf("Payment method has been acquired.\n");
 }
 
-void dispatchFactoryLines()
+//handles the factory line productions (AKA the clients)
+void dispatch_factory_lines()
 {
-	int ii;
-	pid_t pid;
+	int iters[5], dur[5], numOrder[5];
+	struct sockaddr_in  fsn;   //address of client
+    unsigned short portNum = 26 ;  //port num
+	int orderSize, id, socket, finished, curLines;
+    unsigned int aa;  //address len
+    int totalLines;
 
-	printf("Factory lines dispatched.\n");
+    actionsMsg aMsg;
+    serverMsg sMsg;
 
-	/* Create supervisor process */
-	pid = fork();
-	switch (pid)
-	{
-		case -1:
-			perror("Fork failed");
-			exit(-1);
+	printf ("Factory lines dispatched.\n\n");
+	socket = serverUDPsock(portNum);
 
-		case 0:
-			if ( execlp("gnome-terminal", "superVterm", "-x", "/bin/bash",
-									"-c", "./server 5", NULL) == -1 )
-			{
-				perror("Failed to exec supervisor process");
-				exit(-1);
-			}
-
-		default:
-			break;
+	for (int ii = 0; ii < 5; ii++) {
+		iters[ii] = 0;
+		dur[ii] = 0;
+		numOrder[ii] = 0;
 	}
+
+	srand (time(NULL));
+	orderSize = (order_H + rand() / (RAND_MAX/(order_L - order_H + 1) + 1));
+	printf("\nSize of Order: %d\n\n", orderSize);
+	id = 0;
+	finished = 0;
+
+	totalLines = 0;
+	curLines = 0;
+	while(finished != 1)
+    {
+		aa = sizeof(fsn);
+        if(recvfrom(socket, (void *) &aMsg, sizeof(aMsg), 0, (SA *) &fsn, &aa) < 0)
+        {
+            err_sys("Error");
+        }
+
+		if(aMsg.mestype == 1)
+		{
+			curLines++;
+			totalLines++;
+
+			sMsg.info.dur = (dur_H + rand() / (RAND_MAX / (dur_L - dur_H + 1) + 1));
+			sMsg.info.cap = (cap_H + rand() / (RAND_MAX / (cap_L - cap_H + 1) + 1));
+
+			sMsg.mestype = 1;
+			sMsg.info.id = ++id;
+
+		}
+		else if(aMsg.mestype == 2)
+		{
+			if(orderSize == 0)
+			{
+				sMsg.mestype = 3;
+			}
+			else if(orderSize >= aMsg.info.cap)
+			{
+				sMsg.info.items = aMsg.info.cap;
+				orderSize = aMsg.info.cap - 1;
+				sMsg.mestype = 2;
+			}
+			else {
+				sMsg.info.items = orderSize;
+				orderSize = 0;
+				sMsg.mestype = 2;
+			}
+		}
+		else
+		{
+			curLines--;
+			dur[aMsg.info.id - 1] = aMsg.info.dur;
+			numOrder[aMsg.info.id - 1] = aMsg.info.items;
+
+
+			iters[aMsg.info.id - 1] = aMsg.info.iters;
+			if (curLines < 1) {
+				finished = 1;
+
+				//printing out the Factory Line information
+				for (int ii = 0; ii < totalLines; ii++){
+					printf("\nLine %d\n", ii+1);
+					printf("Produced: %d\n", numOrder[ii]);
+					printf("Iterations: %d\n", iters[ii]);
+					printf("Duration: %dms\n", dur[ii]);
+
+				}
+			}
+		}
+
+		if (finished != 1)
+		{
+			sendto(socket, (void *) &sMsg, sizeof(sMsg), 0, (SA *) &fsn, aa);
+		}
+	}
+
+	printf("\nFactory Lines Production Complete.\n");
 }
 
-void shutDownFactoryLines()
+//shuts down the factory lines
+void
+shut_down_factory_lines()
 {
-	printf("Factory lines shutdown.\n");
+	printf ("Factory Lines Shut Down.\n");
 }
 
 #endif
