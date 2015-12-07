@@ -137,11 +137,11 @@ void dispatch_factory_lines()
 			curLines++;
 			totalLines++;
 
-			sMsg.info.dur = (dur_H + rand() / (RAND_MAX / (dur_L - dur_H + 1) + 1));
-			sMsg.info.cap = (cap_H + rand() / (RAND_MAX / (cap_L - cap_H + 1) + 1));
+			sMsg.data.dur = (dur_H + rand() / (RAND_MAX / (dur_L - dur_H + 1) + 1));
+			sMsg.data.cap = (cap_H + rand() / (RAND_MAX / (cap_L - cap_H + 1) + 1));
 
 			sMsg.mestype = 1;
-			sMsg.info.id = ++id;
+			sMsg.data.id = ++id;
 
 		}
 		else if(aMsg.mestype == 2)
@@ -150,14 +150,14 @@ void dispatch_factory_lines()
 			{
 				sMsg.mestype = 3;
 			}
-			else if(orderSize >= aMsg.info.cap)
+			else if(orderSize >= aMsg.data.cap)
 			{
-				sMsg.info.items = aMsg.info.cap;
-				orderSize = aMsg.info.cap - 1;
+				sMsg.data.items = aMsg.data.cap;
+				orderSize = aMsg.data.cap - 1;
 				sMsg.mestype = 2;
 			}
 			else {
-				sMsg.info.items = orderSize;
+				sMsg.data.items = orderSize;
 				orderSize = 0;
 				sMsg.mestype = 2;
 			}
@@ -165,11 +165,11 @@ void dispatch_factory_lines()
 		else
 		{
 			curLines--;
-			dur[aMsg.info.id - 1] = aMsg.info.dur;
-			numOrder[aMsg.info.id - 1] = aMsg.info.items;
+			dur[aMsg.data.id - 1] = aMsg.data.dur;
+			numOrder[aMsg.data.id - 1] = aMsg.data.items;
 
 
-			iters[aMsg.info.id - 1] = aMsg.info.iters;
+			iters[aMsg.data.id - 1] = aMsg.data.iters;
 			if (curLines < 1) {
 				finished = 1;
 
