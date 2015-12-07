@@ -1,5 +1,5 @@
 all:
-	gcc driver.c action.c statemodel.c state.c processing.c shipping.c accepting.c manufacturing.c mySock.c -o driver
-	gcc action.c mySock.c -o action
+	gcc driver.c actions.c statemodel.c state.c processing.c shipping.c accepting.c manufacturing.c mySock.c -o driver
+	gcc actions.c mySock.c -o actions
 clean:
-	rm driver action
+	rm driver actions
