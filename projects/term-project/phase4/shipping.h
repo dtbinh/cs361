@@ -1,8 +1,8 @@
 /*
  * shipping.h
  *
- * Modified on: Oct 26, 2015
- *      Author: Joshua Lyons and Conner Turnbull
+ * Modified on: Dec 6, 2015
+ *      Author: Joshua Lyons and Conner Turnbull (Group 1)
  */
 
 #ifndef SHIPPING_H_
