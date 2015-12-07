@@ -1,54 +1,90 @@
+/*
+ * client.c
+ *
+ * Modified on: Dec 6, 2015
+ *      Author: Joshua Lyons and Conner Turnbull (Group 1)
+ */
+
 #include <sys/types.h>
-#include <sys/socket.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <time.h> 
 #include <errno.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+#include <string.h>
+
 
 #include "mySock.h"
-#define MAXBUFLEN   256
+#define MAXBUFLEN 256
 
-/*------------------------------------------------------------------------
- * main - UDP client for DAYTIME service that prints the resulting time
- *----------------------------------------------------------------------*/
-
-int main(int argc, char *argv[])
+int main(int argc, char** argv)
 {
-    char	*host    = "localhost";    /* host to use if none supplied	*/
-    char	*service = "daytime";      /* default service name	        */
-    char    *msg     = "Bla Bla Bla" ;
-    char    timeStr[MAXBUFLEN];        /* time string   */ 
-    int	    s, n;                      /* socket descriptor, read count */
+	struct timespec time1, time2;
 
-    switch (argc) 
-    {
-        case 1:
-            break;
-        case 3:
-            service = argv[2];
-            /* FALL THROUGH */
-        case 2:
-            host = argv[1];
-            break;
-        default:
-            fprintf(stderr, "usage: %s [host [port]]\n" , argv[0] );
-            exit(1);
-    }
-    s = clientUDPsock( host , service );  
-    /* socket will always send to host:service */
-    /* Therefore, use  in sendto( .... , NULL , 0) */
-    
-    fprintf(stderr , "DAYTIME client sending '%s'\n" , msg ) ;
-    /* must send the \0 at end of msg, too */
-    sendto( s, (void *) msg, strlen(msg)+1, 0, NULL, 0);
-    
-    n = recvfrom( s, (void*) timeStr, MAXBUFLEN, 0, NULL , 0 );
-    if ( n <= 0 )
-        err_sys( "Failed to get the daytime from the server" );
+	char *host = argv[1];
+	char *port = argv[2];
+	int id, dur, totalDur, cap, iters, prod, finished, sd, rc;
 
-    timeStr[strlen(timeStr)-1] = 0 ; /* I hate the \n char placed by ctime_r() */
-    printf( "DAYTIME client received %d chars in '%s'\n" , n , timeStr );
+	finished = 0;
+	totalDur=0;
+	iters=0;
+
+    actionsMsg aMsg;
+    serverMsg  sMsg;
+    aMsg.mestype = 1;
+
+    sd = clientUDPsock(host, port);
+	while (finished != 1) {
+		sendto(sd, (void *) &aMsg, sizeof(aMsg) , NULL , 0 );
+		rc = recvfrom(sd, (void*) &sMsg , sizeof(sMsg) , NULL , 0 );
+
+		//no instructions passed to client
+		if (rc <= 0)
+		{
+		    err_sys("Error - No instructions recieved!");
+		}
+
+		//Prints out factory line's duration and capacity
+		if (sMsg.mestype == 1)
+		{
+			printf("Line: %d - Duration: %d - Capacity: %d.\n", sMsg.info.id, sMsg.info.dur, sMsg.info.cap);
+
+			id = sMsg.info.id;
+			cap = sMsg.info.cap;
+			dur = sMsg.info.dur;
+			aMsg.info.cap = cap;
+			prod = 0;
+			time1.tv_sec = 0;
+			time1.tv_nsec = (dur * 1000000);
+			aMsg.mestype = 2;
+		}
+		//Client doing it's work
+		else if (sMsg.mestype == 2)
+		{
+			aMsg.info.cap = cap;
+			aMsg.info.id = id;
+
+			nanosleep(&time1, &time2); //sleeping to simulate product working
+
+			iters++;
+			prod += sMsg.info.items;
+			totalDur += dur;
+			aMsg.mestype = 2;
+		}
+		//COMPLETE
+		else
+		{
+			printf("Line %d: %d Iterations, %dms Total Duration, Produced %d Items\n", id, iters, totalDur, prod);
+			printf("Line %d's order is complete!\n", id);
+			aMsg.mestype = 3;
+			aMsg.info.dur = totalDur;
+			aMsg.info.items = prod;
+			aMsg.info.iters = iters;
+			finished = 1;
+		}
+	}
+
+	//exiting the client
+	sendto(sd, (void *) &aMsg, sizeof(aMsg) , NULL , 0 );
     exit(0);
 }
