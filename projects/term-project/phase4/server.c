@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 	int curLines = 5;
 	int iters[5], prod[5], cap[5], dur[5];
 
-	msgBuf msg;
+	msgBuffer msg;
 
 	for (int ii = 0; ii < 5; ii++)
 	{
