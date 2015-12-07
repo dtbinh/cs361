@@ -47,12 +47,12 @@ int main(int argc, char** argv)
 		//Prints out factory line's duration and capacity
 		if (sMsg.mestype == 1)
 		{
-			printf("Line: %d - Duration: %d - Capacity: %d.\n", sMsg.info.id, sMsg.info.dur, sMsg.info.cap);
+			printf("Line: %d - Duration: %d - Capacity: %d.\n", sMsg.data.id, sMsg.data.dur, sMsg.data.cap);
 
-			id = sMsg.info.id;
-			cap = sMsg.info.cap;
-			dur = sMsg.info.dur;
-			aMsg.info.cap = cap;
+			id = sMsg.data.id;
+			cap = sMsg.data.cap;
+			dur = sMsg.data.dur;
+			aMsg.data.cap = cap;
 			prod = 0;
 			time1.tv_sec = 0;
 			time1.tv_nsec = (dur * 1000000);
@@ -61,13 +61,13 @@ int main(int argc, char** argv)
 		//Client doing it's work
 		else if (sMsg.mestype == 2)
 		{
-			aMsg.info.cap = cap;
-			aMsg.info.id = id;
+			aMsg.data.cap = cap;
+			aMsg.data.id = id;
 
 			nanosleep(&time1, &time2); //sleeping to simulate product working
 
 			iters++;
-			prod += sMsg.info.items;
+			prod += sMsg.data.items;
 			totalDur += dur;
 			aMsg.mestype = 2;
 		}
@@ -77,9 +77,9 @@ int main(int argc, char** argv)
 			printf("Line %d: %d Iterations, %dms Total Duration, Produced %d Items\n", id, iters, totalDur, prod);
 			printf("Line %d's order is complete!\n", id);
 			aMsg.mestype = 3;
-			aMsg.info.dur = totalDur;
-			aMsg.info.items = prod;
-			aMsg.info.iters = iters;
+			aMsg.data.dur = totalDur;
+			aMsg.data.items = prod;
+			aMsg.data.iters = iters;
 			finished = 1;
 		}
 	}
