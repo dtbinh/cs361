@@ -1,8 +1,8 @@
 /*
  * statemodel.h
  *
- * Modified on: Oct 26, 2015
- *      Author: Joshua Lyons and Conner Turnbull
+ * Modified on: Dec 6, 2015
+ *      Author: Joshua Lyons and Conner Turnbull (Group 1)
  */
 
 #ifndef statemodel_h
@@ -19,4 +19,3 @@ extern state_t shipping;
 void handle_event(event current_event);
 
 #endif
-
