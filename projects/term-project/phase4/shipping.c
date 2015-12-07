@@ -1,7 +1,7 @@
 /*
  * shipping.c
  *
- * Modified on: Oct 26, 2015
+ * Modified on: Dec 6, 2015
  *      Author: Joshua Lyons and Conner Turnbull (Group 1)
  */
 
@@ -14,14 +14,14 @@
 
 state_t shipping = {
 	default_event_handler,
-    	default_event_handler,
-    	default_event_handler,
-    	default_event_handler,
-    	default_event_handler,
-    	recieved_package,
-    	lost_package,
-    	entry_to,
-    	default_action
+    default_event_handler,
+    default_event_handler,
+    default_event_handler,
+    default_event_handler,
+    recieved_package,
+    lost_package,
+    entry_to,
+    default_action
 };
 
 state_t* recieved_package()
