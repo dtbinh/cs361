@@ -1,4 +1,9 @@
-/* mySock.c - utility sunction for socket programming */
+/*
+ * mySock.c
+ *
+ * Modified on: Dec 6, 2015
+ *      Author: Joshua Lyons and Conner Turnbull (Group 1)
+ */
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -15,18 +20,18 @@
 /*------------------------------------------------------------------------
  * Error Handling Functions
  *----------------------------------------------------------------------*/
-void err_sys(const char* x) 
-{ 
+void err_sys(const char* x)
+{
     fflush( stderr ) ;
-    perror(x); 
-    exit(1); 
+    perror(x);
+    exit(1);
 }
 
-void err_quit(const char* x) 
-{ 
+void err_quit(const char* x)
+{
     fflush( stderr ) ;
-    fputs( x , stderr ) ; 
-    exit(1); 
+    fputs( x , stderr ) ;
+    exit(1);
 }
 
 /*------------------------------------------------------------------------
@@ -46,12 +51,12 @@ int clientUDPsock(const char *host, const char *service )
 	int	s, type;	            /* socket descriptor and socket type	*/
 	char   msg[MAXMSGLEN] ;     /* used with snprintf                   */
 	int    errCode ;
-         
+
     /* Allocate a socket */
 	s = socket( AF_INET, SOCK_DGRAM , 0 ) ;
 	if (s < 0)
 		err_sys( "connectsock() can't create socket" ) ;
-    
+
     /* Prepare hints to filter results of getaddrinfo()  */
     memset( &hints , 0 , sizeof( struct addrinfo ) ) ;
 
@@ -59,7 +64,7 @@ int clientUDPsock(const char *host, const char *service )
     hints.ai_socktype = SOCK_DGRAM ;
     hints.ai_flags    = 0 ;
     hints.ai_protocol = IPPROTO_UDP ;
-    
+
     /* Map host name (possibly in dotted decimal) to IP address  */
     errCode = getaddrinfo( host , service , &hints , &ainfo ) ;
 
@@ -67,20 +72,20 @@ int clientUDPsock(const char *host, const char *service )
     {
         snprintf( msg , MAXMSGLEN , "getaddrinfo() failed: %s\n" ,
                   gai_strerror( errCode ) ) ;
-        err_quit( msg ) ;   
+        err_quit( msg ) ;
     }
     else
     {   /* Iterate through the server's IPs trying to connect */
         for (rp = ainfo; rp != NULL; rp = rp->ai_next )
             if ( connect( s, rp->ai_addr, rp->ai_addrlen ) == 0 )
-                break;                  /* Success */ 
+                break;                  /* Success */
 
-        if ( rp == NULL )               /* No address succeeded */    
+        if ( rp == NULL )               /* No address succeeded */
             err_quit( "Could not connect; No gai() address succeeded\n");
     }
 
     freeaddrinfo( ainfo ) ;
-    
+
 	return s;
 }
 
@@ -92,11 +97,11 @@ int clientUDPsock(const char *host, const char *service )
  */
 
 int serverUDPsock(const unsigned short port)
-{	
+{
     struct sockaddr_in sin;	 /* an Internet endpoint address  */
     int	s;                   /* socket descriptor         	  */
-    char   msg[MAXMSGLEN] ;  /* used with snprintf            */
-    
+	char   msg[MAXMSGLEN] ;  /* used with snprintf            */
+
     memset( (void *) &sin, 0 , sizeof(sin) );
     sin.sin_family      = AF_INET;
     sin.sin_addr.s_addr = htonl( INADDR_ANY );
@@ -111,11 +116,10 @@ int serverUDPsock(const unsigned short port)
     /* Bind the socket */
     if ( bind( s, (SA *) &sin, sizeof(sin) ) < 0 )
     {
-        snprintf( msg , MAXMSGLEN , 
+        snprintf( msg , MAXMSGLEN ,
                   "passivesock() can't bind to port %d", port ) ;
         err_sys( msg ) ;
     }
-    fprintf(stderr , "Bound socket %d to port %d\n" , s , ntohs(sin.sin_port) );    
+    fprintf(stderr , "Bound socket %d to port %d\n" , s , ntohs(sin.sin_port) );
 	return s;
 }
-
