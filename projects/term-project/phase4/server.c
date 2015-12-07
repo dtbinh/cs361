@@ -32,14 +32,14 @@ int main(int argc, char** argv)
 	printf("Server is Waiting on Client...\n");
 
 	while(curLines > 0) {
-			if (msg.info.quit == 1)
+			if (msg.data.quit == 1)
 			{
 				iters[msg.info.id - 1]++;
-				cap[msg.info.id - 1] = msg.info.cap;
-				dur[msg.info.id - 1] = msg.info.dur;
-				prod[msg.info.id - 1] += msg.info.prod;
+				cap[msg.data.id - 1] = msg.data.cap;
+				dur[msg.data.id - 1] = msg.data.dur;
+				prod[msg.data.id - 1] += msg.data.prod;
 			}
-			else if (msg.info.quit == 2)
+			else if (msg.data.quit == 2)
 			{
 				curLines--;
 			}
