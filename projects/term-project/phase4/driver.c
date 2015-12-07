@@ -1,7 +1,7 @@
 /*
  * driver.c
  *
- * Modified on: Oct 26, 2015
+ * Modified on: Dec 6, 2015
  *      Author: Joshua Lyons and Conner Turnbull (Group 1)
  */
 
@@ -33,7 +33,7 @@ int main()
                 e = INVALID_PYMNT;
                 handle_event (e);
                 break;
-            case 'F': //manufactering faild
+            case 'F': //manufactering failed
                 e = MANUF_FAILED;
                 handle_event (e);
                 break;
