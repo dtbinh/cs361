@@ -50,8 +50,6 @@ int main(int argc, char *argv[])
     if (recvfrom(s, (void*) &from_msg, sizeof(from_msg), 0, NULL , 0) <= 0)
         err_sys( "Failed to get the message from the server" );
 
-    printf("factory ID from server: %d\n", from_msg.info.factory_ID);
-
     factory_ID = from_msg.info.factory_ID;
     duration = from_msg.info.duration;
     capacity = from_msg.info.capacity;

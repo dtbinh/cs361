@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
   time_t	now;                /* current time                 */
   char    timeStr[MAXBUFLEN]; /* time string                  */
   unsigned int    alen;       /* from-address length          */
-	int ii, order_size, parts_remaining, capacity,
+	int ii, order_size, parts_remaining,
       duration, lines_active, total_produced;
   
   switch (argc) 
@@ -77,9 +77,9 @@ int main(int argc, char *argv[])
             }
           else if ((parts_remaining - from_msg.info.capacity) >= 0) // if this isn't last order
             {
-              to_msg.info.produce = capacity;
-              total_produced += capacity;
-              parts_remaining -= capacity;
+              to_msg.info.produce = from_msg.info.capacity;
+              total_produced += from_msg.info.capacity;
+              parts_remaining -= from_msg.info.capacity;
             }
           else //if this is last order
             {
