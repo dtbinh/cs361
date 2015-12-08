@@ -72,6 +72,9 @@ int main(int argc, char *argv[])
         }
       else
         {
+          parts_remaining -= from_msg.info.produce;
+          total_produced += from_msg.info.produce;
+
           to_msg.info.factory_ID = from_msg.info.factory_ID;
           to_msg.info.capacity = from_msg.info.capacity;
           to_msg.info.duration = from_msg.info.duration;
@@ -82,19 +85,17 @@ int main(int argc, char *argv[])
           else if ((parts_remaining - from_msg.info.capacity) >= 0) // if this isn't last order
             {
               to_msg.info.produce = from_msg.info.capacity;
-              total_produced += from_msg.info.capacity;
-              parts_remaining -= from_msg.info.capacity;
             }
           else //if this is last order
             {
               to_msg.info.produce = parts_remaining;
-              total_produced += parts_remaining;
-              parts_remaining = 0;
             }
         }
       
-      sendto( sock , (void *) &to_msg, sizeof(to_msg), 0, (SA *) &fsin, alen );
+      if (lines_active <= 5)
+        sendto( sock , (void *) &to_msg, sizeof(to_msg), 0, (SA *) &fsin, alen );
     }
 
   printf ("Total items produced: %d\n", total_produced);
+  while (1);
 }

@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
             exit(1);
     }
 
-    s = clientUDPsock( host , service );  
+    while(clientUDPsock( host , service ) < 0);  
     /* socket will always send to host:service */
     /* Therefore, use  in sendto( .... , NULL , 0) */
     
