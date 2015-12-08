@@ -7,10 +7,15 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#include "message.h"
-#include "mySock.h"
+#include "message.h" //for program 4
+#include "mySock.h" //for program 4
 #define MAXBUFLEN   256
 
+/*  
+*   NAME: main
+* 
+*   This method starts the server
+*/
 int main(int argc, char *argv[])
 {
   struct sockaddr_in  fsin;   /* the from address of a client */
@@ -25,6 +30,7 @@ int main(int argc, char *argv[])
 	int ii, order_size, parts_remaining,
       duration, lines_active, total_produced, done;
   
+  //switch for the server
   switch (argc) 
     {
     case 1:
@@ -41,6 +47,7 @@ int main(int argc, char *argv[])
 	srandom(time(NULL));
   sock = serverUDPsock(port);
 
+  //Loop for the server
   while (1)
     {
       lines_active = 0;
@@ -52,6 +59,7 @@ int main(int argc, char *argv[])
 
       printf("Order size: %d\n", order_size);
       
+      //during all output
       while (!done) 
         {
           alen = sizeof(fsin);
@@ -98,6 +106,7 @@ int main(int argc, char *argv[])
                 }
             }
           
+          //once program has finished all output
           if (done)
             {
               while (lines_active > 0)
