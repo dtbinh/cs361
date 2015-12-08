@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
           to_msg.info.factory_ID = lines_active;
           to_msg.info.capacity = (random() % 41) + 10;
           to_msg.info.duration = (random() % 5) + 1;
-          to_msg.info.produce = 999999;
+          to_msg.info.produce = from_msg.info.capacity;
         }
       else
         {

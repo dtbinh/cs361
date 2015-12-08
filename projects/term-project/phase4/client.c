@@ -58,14 +58,15 @@ int main(int argc, char *argv[])
     num_iters = 0;
     total_produced = 0;
 
-    to_msg.info.factory_ID = factory_ID;
-    to_msg.info.capacity = capacity;
-    to_msg.info.duration = duration;
-    to_msg.info.produce = from_msg.info.produce;
-
     while (from_msg.info.produce) // if this is zero, stop
     {
       sleep (duration);
+
+      to_msg.info.factory_ID = factory_ID;
+      to_msg.info.capacity = capacity;
+      to_msg.info.duration = duration;
+      to_msg.info.produce = from_msg.info.produce;
+
       sendto(s, (void *) &to_msg, sizeof(to_msg), 0, NULL, 0);
       if (recvfrom(s, (void*) &from_msg, sizeof(from_msg), 0, NULL , 0) <= 0)
           err_sys( "Failed to get the message from the server" );
