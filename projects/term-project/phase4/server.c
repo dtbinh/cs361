@@ -57,6 +57,8 @@ int main(int argc, char *argv[])
       if ( recvfrom( sock, (void *)&from_msg, sizeof(from_msg), 0, (SA *) &fsin, &alen ) < 0 )
         err_sys( "recvfrom" );
 
+      printf("Hello? Here's a message %d\n", from_msg.info.factory_ID);
+
       /* New factory line */
       if (from_msg.info.factory_ID == 1234 && lines_active < 5)
         {
@@ -64,6 +66,7 @@ int main(int argc, char *argv[])
           to_msg.info.factory_ID = lines_active;
           to_msg.info.capacity = (random() % 41) + 10;
           to_msg.info.duration = (random() % 5) + 1;
+          sendto( sock , (void *) &to_msg, sizeof(to_msg), 0, (SA *) &fsin, alen );
         }
       else
         {
