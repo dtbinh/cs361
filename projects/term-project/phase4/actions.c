@@ -21,21 +21,41 @@
 int attempts = 0;
 int order_size = 0;
 
+/*  
+*   NAME: getAddress
+* 
+*   This method gets the address
+*/
 void getAddress()
 {
 	printf("Got the address.\n");
 }
 
+/*  
+*   NAME: chargeClient
+* 
+*   This method charges the client
+*/
 void chargeClient()
 {
 	printf("Charged the client.\n");
 }
 
+/*  
+*   NAME: startWarranty
+* 
+*   This method begins the warranty
+*/
 void startWarranty()
 {
 	printf("Started the warranty.\n");
 }
 
+/*  
+*   NAME: updateStats
+* 
+*   This method takes in a value and prints out the updated stats.
+*/
 void updateStats(stats value)
 {
 	if(value == 0)
@@ -57,17 +77,32 @@ void updateStats(stats value)
 
 }
 
+/*  
+*   NAME: refund
+* 
+*   This method refunds a lost package
+*/
 void refund()
 {
 	printf("Refunded due to lost package.\n");
 }
 
+/*  
+*   NAME: resetAttempts
+* 
+*   This method resets attempts
+*/
 void resetAttempts()
 {
 	attempts = 0;
 	printf("Attempts have been reset.\n");
 }
 
+/*  
+*   NAME: incrementAttempts
+* 
+*   This method increments number of attempts
+*/
 int incrementAttempts()
 {
 	attempts += 1;
@@ -87,11 +122,21 @@ int incrementAttempts()
 	return attempts;
 }
 
+/*  
+*   NAME: getPaymentMethod
+* 
+*   This method the method of payment
+*/
 void getPaymentMethod()
 {
 	printf("Payment method has been acquired.\n");
 }
 
+/*  
+*   NAME: dispatchFactoryLines
+* 
+*   This method dispatches the factory manufacturing lines
+*/
 void dispatchFactoryLines()
 {
 	int ii;
@@ -109,7 +154,7 @@ void dispatchFactoryLines()
 
 		case 0:
 			if ( execlp("gnome-terminal", "superVterm", "-x", "/bin/bash",
-									"-c", "./server 66", NULL) == -1 )
+				"-c", "./server 66", NULL) == -1 )
 			{
 				perror("Failed to exec supervisor process");
 				exit(-1);
@@ -120,6 +165,11 @@ void dispatchFactoryLines()
 	}
 }
 
+/*  
+*   NAME: shutDownFactoryLines
+* 
+*   This method shuts down all factory lines
+*/
 void shutDownFactoryLines()
 {
 	printf("Factory lines shutdown.\n");
