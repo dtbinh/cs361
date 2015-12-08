@@ -58,6 +58,7 @@ int main(int argc, char *argv[])
     num_iters = 0;
     total_produced = 0;
 
+    to_msg.info.factory_ID = factory_ID;
     to_msg.info.capacity = capacity;
     to_msg.info.duration = duration;
     to_msg.info.produce = from_msg.info.produce;
