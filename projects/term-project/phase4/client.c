@@ -66,12 +66,13 @@ int main(int argc, char *argv[])
       to_msg.info.duration = duration;
       to_msg.info.produce = from_msg.info.produce;
 
+      printf("Line %d produced %d items\n", factory_ID, from_msg.info.produce);
+
       sendto(s, (void *) &to_msg, sizeof(to_msg), 0, NULL, 0);
       if (recvfrom(s, (void*) &from_msg, sizeof(from_msg), 0, NULL , 0) <= 0)
           err_sys( "Failed to get the message from the server" );
       num_iters++;
       total_produced += from_msg.info.produce;
-      printf("Line %d produced %d items\n", factory_ID, from_msg.info.produce);
     }
 
     printf("Line %d has completed %d iterations, %d items in %d seconds\n", factory_ID,
