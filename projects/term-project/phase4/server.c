@@ -67,6 +67,8 @@ int main(int argc, char *argv[])
         }
       else
         {
+          printf ("Line %d produced %d in %d seconds\n", from_msg.info.factory_ID, from_msg.info.produce,
+                  from_msg.info.duration);
           parts_remaining -= from_msg.info.produce;
           total_produced += from_msg.info.produce;
 

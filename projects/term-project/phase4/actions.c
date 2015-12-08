@@ -118,26 +118,6 @@ void dispatchFactoryLines()
 		default:
 			break;
 	}
-
-  /* Create client */
-	pid = fork();
-	switch (pid)
-	{
-		case -1:
-			perror("Fork failed");
-			exit(-1);
-
-		case 0:
-			if ( execlp("gnome-terminal", "superVterm", "-x", "/bin/bash",
-									"-c", "./client localhost 50066", NULL) == -1 )
-			{
-				perror("Failed to exec supervisor process");
-				exit(-1);
-			}
-
-		default:
-			break;
-	}
 }
 
 void shutDownFactoryLines()
