@@ -109,7 +109,7 @@ void dispatchFactoryLines()
 
 		case 0:
 			if ( execlp("gnome-terminal", "superVterm", "-x", "/bin/bash",
-									"-c", "./server 5", NULL) == -1 )
+									"-c", "./server 80", NULL) == -1 )
 			{
 				perror("Failed to exec supervisor process");
 				exit(-1);
@@ -117,6 +117,30 @@ void dispatchFactoryLines()
 
 		default:
 			break;
+	}
+
+
+	// Create 5 factory line processes
+	for (ii = 1; ii <= 5; ii++)
+	{
+		pid = fork();
+		switch (pid)
+		{
+			case -1:
+				perror("Fork failed");
+				exit(-1);
+
+			case 0:
+				if ( execlp("gnome-terminal", "SuperVterm", "-x", "/bin/bash", "-c",
+										"./client", NULL) == -1 )
+				{
+					perror("Failed to exec factoryline process");
+					exit(-1);
+				}
+
+			default:
+				break;
+		}
 	}
 }
 

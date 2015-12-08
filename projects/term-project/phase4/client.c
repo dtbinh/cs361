@@ -7,6 +7,7 @@
 #include <time.h> 
 #include <errno.h>
 
+#include "message.h"
 #include "mySock.h"
 #define MAXBUFLEN   256
 
@@ -17,10 +18,12 @@
 int main(int argc, char *argv[])
 {
     char	*host    = "localhost";    /* host to use if none supplied	*/
-    char	*service = "daytime";      /* default service name	        */
+    char	*service = "80";      /* default service name	        */
     char    *msg     = "Bla Bla Bla" ;
     char    timeStr[MAXBUFLEN];        /* time string   */ 
-    int	    s, n;                      /* socket descriptor, read count */
+    int	    s;                         /* socket descriptor */
+    msgBuf from_msg, to_msg;
+    int factory_ID, duration, capacity, num_iters, total_produced;
 
     switch (argc) 
     {
@@ -36,19 +39,40 @@ int main(int argc, char *argv[])
             fprintf(stderr, "usage: %s [host [port]]\n" , argv[0] );
             exit(1);
     }
+
     s = clientUDPsock( host , service );  
     /* socket will always send to host:service */
     /* Therefore, use  in sendto( .... , NULL , 0) */
     
-    fprintf(stderr , "DAYTIME client sending '%s'\n" , msg ) ;
-    /* must send the \0 at end of msg, too */
-    sendto( s, (void *) msg, strlen(msg)+1, 0, NULL, 0);
+    to_msg.info.factory_ID = 1234; // Nonsense number. This process needs an ID from the server
+    sendto(s, (void *) &to_msg, sizeof(to_msg), 0, NULL, 0);
     
-    n = recvfrom( s, (void*) timeStr, MAXBUFLEN, 0, NULL , 0 );
-    if ( n <= 0 )
-        err_sys( "Failed to get the daytime from the server" );
+    if (recvfrom(s, (void*) &from_msg, sizeof(from_msg), 0, NULL , 0) <= 0)
+        err_sys( "Failed to get the message from the server" );
 
-    timeStr[strlen(timeStr)-1] = 0 ; /* I hate the \n char placed by ctime_r() */
-    printf( "DAYTIME client received %d chars in '%s'\n" , n , timeStr );
+    factory_ID = from_msg.info.factory_ID;
+    duration = from_msg.info.duration;
+    capacity = from_msg.info.capacity;
+    num_iters = 0;
+    total_produced = 0;
+
+    to_msg.info.capacity = capacity;
+    to_msg.info.duration = duration;
+    to_msg.info.produce = from_msg.info.produce;
+
+    while (from_msg.info.produce) // if this is zero, stop
+    {
+      sleep (duration);
+      sendto(s, (void *) &to_msg, sizeof(to_msg), 0, NULL, 0);
+      if (recvfrom(s, (void*) &from_msg, sizeof(from_msg), 0, NULL , 0) <= 0)
+          err_sys( "Failed to get the message from the server" );
+      num_iters++;
+      total_produced += from_msg.info.produce;
+    }
+
+    printf("Line %d has completed %d iterations, %d items in %d seconds\n", factory_ID,
+       num_iters, total_produced, num_iters * duration);
+    printf("Line %d has completed its portion of the order\n", factory_ID);
+
     exit(0);
 }
