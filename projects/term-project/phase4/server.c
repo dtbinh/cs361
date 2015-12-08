@@ -49,8 +49,10 @@ int main(int argc, char *argv[])
   total_produced = 0;
 	order_size = (random() % 1001) + 1000;
 	parts_remaining = order_size;
+
+  printf("Order size: %d\n", order_size);
   
-  while (1) 
+  while (parts_remaining) 
     {
       alen = sizeof(fsin);
 
@@ -65,6 +67,8 @@ int main(int argc, char *argv[])
           to_msg.info.capacity = (random() % 41) + 10;
           to_msg.info.duration = (random() % 5) + 1;
           to_msg.info.produce = from_msg.info.capacity;
+
+          printf ("Line %d started\n", lines_active);
         }
       else
         {

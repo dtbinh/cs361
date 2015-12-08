@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
     capacity = from_msg.info.capacity;
     num_iters = 0;
     total_produced = 0;
+    printf("Line %d started. Duration: %d Capacity: %d\n", factory_ID, duration, capacity);
 
     while (from_msg.info.produce) // if this is zero, stop
     {
