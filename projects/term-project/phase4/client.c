@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
     msgBuf from_msg, to_msg;
     int factory_ID, duration, capacity, num_iters, total_produced;
 
+    //A switch for the client
     switch (argc) 
       {
           case 1:
@@ -59,6 +60,7 @@ int main(int argc, char *argv[])
 
     while (from_msg.info.produce) // if this is zero, stop
       {
+        //Sleeps for the durration
         sleep (duration);
 
         to_msg.info.factory_ID = factory_ID;
@@ -79,5 +81,6 @@ int main(int argc, char *argv[])
        num_iters, total_produced, num_iters * duration);
     printf("Line %d has completed its portion of the order\n", factory_ID);
 
+    //exits the program
     exit(0);
 }
