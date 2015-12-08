@@ -1,8 +1,8 @@
 /*
  * processing.h
  *
- * Modified on: Dec 6, 2015
- *      Author: Joshua Lyons and Conner Turnbull (Group 1)
+ * Modified on: Oct 26, 2015
+ *      Author: Joshua Lyons and Conner Turnbull
  */
 
 #ifndef PROCESSING_H_
@@ -12,6 +12,6 @@
 
 static state_t* valid_payment();
 static state_t* invalid_payment();
-static void		entry_to();
+static void	entry_to();
 
 #endif

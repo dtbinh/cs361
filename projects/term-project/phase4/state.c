@@ -1,7 +1,7 @@
 /*
  * state.c
  *
- * Modified on: Dec 6, 2015
+ * Modified on: Oct 26, 2015
  *      Author: Joshua Lyons and Conner Turnbull (Group 1)
  */
 

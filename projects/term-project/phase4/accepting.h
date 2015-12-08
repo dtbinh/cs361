@@ -1,8 +1,8 @@
 /*
  * accepting.h
  *
- * Modified on: Dec 6, 2015
- *      Author: Joshua Lyons and Conner Turnbull (Group 1)
+ * Modified on: Oct 26, 2015
+ *      Author: Joshua Lyons and Conner Turnbull
  */
 
 #ifndef ACCEPTING_H_
@@ -13,3 +13,4 @@
 static state_t* order_recieved();
 
 #endif
+

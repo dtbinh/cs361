@@ -1,7 +1,7 @@
 /*
  * actions.c
  *
- * Modified on: Dec 6, 2015
+ * Modified on: Oct 26, 2015
  *      Author: Joshua Lyons and Conner Turnbull (Group 1)
  */
 
@@ -9,16 +9,14 @@
 #define ACTIONS_C_
 
 #include <stdio.h>
-#include "mySock.h"
 #include "actions.h"
 #include <time.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include <unistd.h>
+#include <semaphore.h>
 #include <sys/shm.h>
 #include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 
 int attempts = 0;
 int order_size = 0;
@@ -94,110 +92,133 @@ void getPaymentMethod()
 	printf("Payment method has been acquired.\n");
 }
 
-//handles the factory line productions (AKA the clients)
-void dispatch_factory_lines()
+void dispatchFactoryLines()
 {
-	int iters[5], dur[5], numOrder[5];
-	struct sockaddr_in  fsn;   //address of client
-    unsigned short portNum = 26 ;  //port num
-	int orderSize, id, socket, finished, curLines;
-    unsigned int aa;  //address len
-    int totalLines;
+	int shmid,
+			shmflg;
+	key_t shmkey;
+	shared_data *p;
 
-    actionsMsg aMsg;
-    serverMsg sMsg;
+	int ii, capacity, duration;
+	pthread_t tid1, tid2, tid3, tid4, tid5;
+	pid_t pid;
+	char userprog[50];
 
-	printf ("Factory lines dispatched.\n\n");
-	socket = serverUDPsock(portNum);
+	shmkey = SHMEM_KEY ;
+	shmflg = IPC_CREAT | S_IRUSR | S_IWUSR  /* | IPC_EXCL */ ;
 
-	for (int ii = 0; ii < 5; ii++) {
-		iters[ii] = 0;
-		dur[ii] = 0;
-		numOrder[ii] = 0;
+	shmid = shmget( shmkey , SHMEM_SIZE , shmflg );
+
+	if (shmid == -1)
+	{
+		printf("\nFailed to create/find shared memory '0x%X'.\n", shmkey );
+		perror("Reason:");
+		exit(-1);
 	}
 
-	srand (time(NULL));
-	orderSize = (order_H + rand() / (RAND_MAX/(order_L - order_H + 1) + 1));
-	printf("\nSize of Order: %d\n\n", orderSize);
-	id = 0;
-	finished = 0;
+	p = (shared_data *) shmat( shmid , NULL , 0 );
+	if (p == (shared_data *) -1)
+	{
+		printf ("\nFailed to attach shared memory id=%d\n" , shmid );
+		perror("Reason:");
+		exit(-1) ;
+	} 
 
-	totalLines = 0;
-	curLines = 0;
-	while(finished != 1)
-    {
-		aa = sizeof(fsn);
-        if(recvfrom(socket, (void *) &aMsg, sizeof(aMsg), 0, (SA *) &fsn, &aa) < 0)
-        {
-            err_sys("Error");
-        }
+	printf("Factory lines dispatched.\n");
 
-		if(aMsg.mestype == 1)
-		{
-			curLines++;
-			totalLines++;
+	p->parts_remaining = 0;
+	p->total = 0;
 
-			sMsg.data.dur = (dur_H + rand() / (RAND_MAX / (dur_L - dur_H + 1) + 1));
-			sMsg.data.cap = (cap_H + rand() / (RAND_MAX / (cap_L - cap_H + 1) + 1));
+	//sets the random seed value and assigns a random value to
+	//order_size between 1000-2000 (inclusively)
+	srandom(time(NULL));
+	order_size = (random() % 1001) + 1000;
+	printf("Order Size: %d\n", order_size);
 
-			sMsg.mestype = 1;
-			sMsg.data.id = ++id;
+	//sets parts_remaining, which will be used to keep track of how long the
+	//threads will run
+	p->parts_remaining = order_size;
+	if (sem_init(&(p->cntMutex), 1, 1))
+  {
+    perror("Failed to init cntMutex semaphore");
+    exit(-1);
+  }
 
-		}
-		else if(aMsg.mestype == 2)
-		{
-			if(orderSize == 0)
+	if (sem_init(&(p->factory_lines_finished), 1, 0))
+  {
+    perror("Failed to init factory_lines_finished semaphore");
+    exit(-1);
+  }
+
+	if (sem_init(&(p-> print_aggregates), 1, 0))
+  {
+    perror("Failed to init print_aggregates semaphore"); exit(-1);
+  } 
+
+  /* execlp child processes */
+
+	/* Create supervisor process */
+	pid = fork();
+	switch (pid)
+	{
+		case -1:
+			perror("Fork failed");
+			exit(-1);
+
+		case 0:
+			if ( execlp("gnome-terminal", "superVterm", "-x", "/bin/bash",
+									"-c", "./supervisor 5", NULL) == -1 )
 			{
-				sMsg.mestype = 3;
+				perror("Failed to exec supervisor process");
+				exit(-1);
 			}
-			else if(orderSize >= aMsg.data.cap)
-			{
-				sMsg.data.items = aMsg.data.cap;
-				orderSize = aMsg.data.cap - 1;
-				sMsg.mestype = 2;
-			}
-			else {
-				sMsg.data.items = orderSize;
-				orderSize = 0;
-				sMsg.mestype = 2;
-			}
-		}
-		else
+
+		default:
+			break;
+	}
+	
+	// Create 5 factory line processes
+	for (ii = 1; ii <= 5; ii++)
+	{
+		capacity = (random() % 41) + 10;  //sets random capacity between 10-50
+		duration = (random() % 5) + 1;  //sets random duration between 1-5
+		pid = fork();
+		switch (pid)
 		{
-			curLines--;
-			dur[aMsg.data.id - 1] = aMsg.data.dur;
-			numOrder[aMsg.data.id - 1] = aMsg.data.items;
+			case -1:
+				perror("Fork failed");
+				exit(-1);
 
-
-			iters[aMsg.data.id - 1] = aMsg.data.iters;
-			if (curLines < 1) {
-				finished = 1;
-
-				//printing out the Factory Line information
-				for (int ii = 0; ii < totalLines; ii++){
-					printf("\nLine %d\n", ii+1);
-					printf("Produced: %d\n", numOrder[ii]);
-					printf("Iterations: %d\n", iters[ii]);
-					printf("Duration: %dms\n", dur[ii]);
-
+			case 0:
+				sprintf(userprog, "./factoryline %d %d %d", ii, capacity, duration);
+				if ( execlp("gnome-terminal", "SuperVterm", "-x", "/bin/bash", "-c",
+										userprog, NULL) == -1 )
+				{
+					perror("Failed to exec factoryline process");
+					exit(-1);
 				}
-			}
-		}
 
-		if (finished != 1)
-		{
-			sendto(socket, (void *) &sMsg, sizeof(sMsg), 0, (SA *) &fsn, aa);
+			default:
+				break;
 		}
 	}
 
-	printf("\nFactory Lines Production Complete.\n");
+	if (sem_wait(&(p->factory_lines_finished)))
+  {
+    perror("Failed to wait for factory_lines_finished semapohre");
+    exit(-1);
+  }
+
+	if (sem_post(&(p->print_aggregates)))
+  {
+    perror("Failed to post for print_aggregates semapohre");
+    exit(-1);
+  }
 }
 
-//shuts down the factory lines
-void
-shut_down_factory_lines()
+void shutDownFactoryLines()
 {
-	printf ("Factory Lines Shut Down.\n");
+	printf("Factory lines shutdown.\n");
 }
 
 #endif

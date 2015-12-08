@@ -1,7 +1,7 @@
 /*
  * manufacturing.c
  *
- * Modified on: Dec 6, 2015
+ * Modified on: Oct 26, 2015
  *      Author: Joshua Lyons and Conner Turnbull (Group 1)
  */
 
@@ -14,14 +14,14 @@
 
 state_t manufacturing = {
 	default_event_handler,
-    default_event_handler,
-    default_event_handler,
-    manufacturing_failed,
-    manufacturing_completed,
-    default_event_handler,
-    default_event_handler,
-    entry_to,
-    exit_from
+    	default_event_handler,
+    	default_event_handler,
+    	manufacturing_failed,
+    	manufacturing_completed,
+    	default_event_handler,
+    	default_event_handler,
+    	entry_to,
+    	exit_from
 };
 
 state_t* manufacturing_failed()

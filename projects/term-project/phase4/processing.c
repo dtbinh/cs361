@@ -1,28 +1,52 @@
 /*
- * mySock.h
+ * processing.c
  *
- * Modified on: Dec 6, 2015
+ * Modified on: Oct 26, 2015
  *      Author: Joshua Lyons and Conner Turnbull (Group 1)
  */
 
-void err_quit(const char* x);
-void err_sys(const char* x);
-int clientUDPsock(const char *host, const char *service ) ;
-int serverUDPsock(const unsigned short port) ;
+#ifndef PROCESSING_C_
+#define PROCESSING_C_
 
-typedef struct {
-	long mestype;
-	struct {
-		int id, cap, items, dur, iters;
-	} info;
-} actionsMsg;
+#include "processing.h"
+#include "actions.h"
+#include "statemodel.h"
 
-typedef struct {
-	long mestype;
-	struct {
-		int id, cap, items, dur;
-	} info;
-} serverMsg;
+state_t processing = {
+	default_event_handler,
+	valid_payment,
+    	invalid_payment,
+    	default_event_handler,
+    	default_event_handler,
+    	default_event_handler,
+    	default_event_handler,
+    	entry_to,
+    	default_action
+};
 
-typedef struct sockaddr SA ;
-#define BASEPORT 50000
+state_t* valid_payment()
+{
+    return &manufacturing;
+}
+
+state_t* invalid_payment()
+{
+	int attempts;
+
+	attempts = incrementAttempts();
+	if(attempts < 3)
+	{
+		return &processing;
+	}
+	else
+	{
+		return &accepting;
+	}
+}
+
+void entry_to()
+{
+    getPaymentMethod();
+}
+
+#endif

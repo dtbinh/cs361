@@ -1,32 +1,21 @@
-/*
- * message.h
- *
- * Modified on: Dec 6, 2015
- *      Author: Joshua Lyons and Conner Turnbull (Group 1)
- */
-#ifndef MESSAGE_H_
-#define MESSAGE_H_
-
 #include <sys/types.h>
-
 #define MAXNAMELEN 20
+typedef struct {
+	long mtype ; 			/* 1: production , 2: termination */
 
-typedef struct
-{
-	long mestype;
-	struct
-	{
-		int id;
-		int quit;
-		int cap;
-		int prod;
-		int dur;
-	} data;
-} msgBuffer;
+	struct {
+    pid_t sender; 		/* ID of sending process */
+    int factory_ID,
+        capacity,
+        num_parts,
+        duration,
+        num_iters,
+        produced,
+        is_done;
+	} info; 
+} msgBuf ;
 
-#define MSG_INFO_SIZE ( sizeof(msgBuf) - sizeof(long))
-#define BASE_MAILBOX_NAME 0x32
+#define MSG_INFO_SIZE ( sizeof(msgBuf) - sizeof(long) )
+#define BASE_MAILBOX_NAME 0x20
 
-void printMsg( msgBuffer *m);
-
-#endif
+void printMsg( msgBuf *m ) ;
