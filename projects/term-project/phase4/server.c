@@ -97,21 +97,19 @@ int main(int argc, char *argv[])
       
       if (done)
         {
-          if ( recvfrom( sock, (void *)&from_msg, sizeof(from_msg), 0, (SA *) &fsin, &alen ) < 0 )
-            err_sys( "recvfrom" );
           while (lines_active > 0)
             {
+              if ( recvfrom( sock, (void *)&from_msg, sizeof(from_msg), 0, (SA *) &fsin, &alen ) < 0 )
+                err_sys( "recvfrom" );
+
               printf("LOOPS!\n");
               to_msg.info.factory_ID = from_msg.info.factory_ID;
               to_msg.info.capacity = from_msg.info.capacity;
               to_msg.info.duration = from_msg.info.duration;
               to_msg.info.produce = 0;
+
               sendto( sock , (void *) &to_msg, sizeof(to_msg), 0, (SA *) &fsin, alen );
-
               lines_active--;
-
-              if ( recvfrom( sock, (void *)&from_msg, sizeof(from_msg), 0, (SA *) &fsin, &alen ) < 0 )
-                err_sys( "recvfrom" );
             }
         }
 

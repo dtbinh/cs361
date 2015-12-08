@@ -68,9 +68,10 @@ int main(int argc, char *argv[])
 
       printf("Line %d produced %d items\n", factory_ID, from_msg.info.produce);
 
-      sendto(s, (void *) &to_msg, sizeof(to_msg), 0, NULL, 0);
       if (recvfrom(s, (void*) &from_msg, sizeof(from_msg), 0, NULL , 0) <= 0)
           err_sys( "Failed to get the message from the server" );
+
+      sendto(s, (void *) &to_msg, sizeof(to_msg), 0, NULL, 0);
       num_iters++;
       total_produced += from_msg.info.produce;
     }
