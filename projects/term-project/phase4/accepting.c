@@ -24,6 +24,11 @@ state_t accepting = {
     	default_action
 };
 
+/*  
+*   NAME: order_recieved
+* 
+*   This method handles recieved orders
+*/
 state_t* order_recieved()
 {
     resetAttempts();
