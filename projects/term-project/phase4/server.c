@@ -11,11 +11,6 @@
 #include "mySock.h"
 #define MAXBUFLEN   256
 
-/*------------------------------------------------------------------------
- * main - Iterative UDP server for DAYTIME service
- *------------------------------------------------------------------------
- */
-
 int main(int argc, char *argv[])
 {
   struct sockaddr_in  fsin;   /* the from address of a client */
@@ -92,8 +87,7 @@ int main(int argc, char *argv[])
             }
         }
       
-      if (lines_active <= 5)
-        sendto( sock , (void *) &to_msg, sizeof(to_msg), 0, (SA *) &fsin, alen );
+      if (lines_active <= 5) sendto( sock , (void *) &to_msg, sizeof(to_msg), 0, (SA *) &fsin, alen );
     }
 
   printf ("Total items produced: %d\n", total_produced);
